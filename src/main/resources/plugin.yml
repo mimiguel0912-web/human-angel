@@ -4,21 +4,21 @@ main: com.humanangel.Main
 api-version: 1.21
 commands:
   sc:
-    description: Chat secreto da staff.
+    description: "Chat exclusivo para a staff."
   spawn:
-    description: Volta para o inicio.
-  ha:
-    description: Comando de administrador.
+    description: "Teleporta para o ponto inicial."
   mode:
-    description: Muda o modo de jogo rapido (c,s,a,sp).
+    description: "Muda o modo de jogo rapido (c,s,a,sp)."
   tamanho:
-    description: Muda a tua escala (Normal e 1).
+    description: "Altera a escala do jogador."
   pvp:
-    description: Ativa ou desativa o combate.
-  control:
-    description: Abre o menu de controle de jogadores.
-  clearlag:
-    description: Limpa os itens do chao manualmente.
+    description: "Ativa ou desativa o combate global."
   angelwand:
-    description: Pega o Tridente sagrado para editar o mundo.
+    description: "Pega o Tridente Arcanjo para edicao."
+  control:
+    description: "Abre o menu de controle de jogadores."
+  clearlag:
+    description: "Limpa os itens do chao manualmente."
+  ha:
+    description: "Comando principal do plugin."
     
