@@ -3,21 +3,22 @@ version: 1.2
 main: com.humanangel.Main
 api-version: 1.21
 commands:
-  # Comandos da Versão 1.0/1.1
   sc:
-    description: Chat exclusivo da staff.
+    description: Chat secreto da staff.
   spawn:
-    description: Teleporta para o spawn.
+    description: Volta para o inicio.
   ha:
-    description: Comando principal (reload).
-  zoeira:
-    description: Gerencia as frases de zoeira.
-
-  # Comandos Novos da Versão 1.2
+    description: Comando de administrador.
   mode:
-    description: Muda o modo de jogo rapidamente.
+    description: Muda o modo de jogo rapido (c,s,a,sp).
   tamanho:
-    description: Altera o tamanho do jogador (escala).
+    description: Muda a tua escala (Normal e 1).
   pvp:
-    description: Liga ou desliga o seu PvP.
+    description: Ativa ou desativa o combate.
+  control:
+    description: Abre o menu de controle de jogadores.
+  clearlag:
+    description: Limpa os itens do chao manualmente.
+  angelwand:
+    description: Pega o Tridente sagrado para editar o mundo.
     
