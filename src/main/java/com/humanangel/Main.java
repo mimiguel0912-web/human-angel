@@ -1,73 +1,93 @@
 package com.humanangel;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Sound;
+import org.bukkit.GameMode;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.plugin.java.JavaPlugin;
-import java.util.HashMap;
-import java.util.UUID;
+import java.util.HashSet;
+import java.util.Set;
 
-public class Main extends JavaPlugin implements Listener, CommandExecutor {
+public class Main extends JavaPlugin implements Listener {
 
-    private HashMap<UUID, Integer> teleportando = new HashMap<>();
+    private final Set<String> pvpOff = new HashSet<>();
 
     @Override
     public void onEnable() {
-        saveDefaultConfig();
-        getCommand("sc").setExecutor(this);
-        getCommand("spawn").setExecutor(this);
-        getServer().getPluginManager().registerEvents(this, this);
-        
-        // Loop das frases de zoeira
-        Bukkit.getScheduler().runTaskTimer(this, () -> {
-            String prefixo = getConfig().getString("Zoeira.prefixo");
-            java.util.List<String> frases = getConfig().getStringList("Zoeira.frases");
-            String fraseAleatoria = frases.get(new java.util.Random().nextInt(frases.size()));
-            Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', prefixo + fraseAleatoria));
-        }, 0L, getConfig().getInt("Zoeira.tempo-segundos") * 20L);
+        Bukkit.getPluginManager().registerEvents(this, this);
+        getLogger().info("Human Angel 1.2 - Pronto para a zoeira!");
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if (!(sender instanceof Player)) return true;
-        Player p = (Player) sender;
+    public boolean onCommand(CommandSender remetente, Command cmd, String label, String[] argumentos) {
+        if (!(remetente instanceof Player)) return true;
+        Player p = (Player) remetente;
 
+        // COMANDO /MODE (Rápido)
+        if (cmd.getName().equalsIgnoreCase("mode")) {
+            if (argumentos.length < 2) {
+                p.sendMessage("§eUse: /mode <nick> <c/s/a/sp>");
+                return true;
+            }
+            Player alvo = Bukkit.getPlayer(argumentos[0]);
+            if (alvo == null) return true;
+            
+            switch (argumentos[1].toLowerCase()) {
+                case "c": alvo.setGameMode(GameMode.CREATIVE); break;
+                case "s": alvo.setGameMode(GameMode.SURVIVAL); break;
+                case "a": alvo.setGameMode(GameMode.ADVENTURE); break;
+                case "sp": alvo.setGameMode(GameMode.SPECTATOR); break;
+            }
+            p.sendMessage("§aModo de " + alvo.getName() + " alterado!");
+            return true;
+        }
+
+        // COMANDO /TAMANHO (Escala 1.21)
+        if (cmd.getName().equalsIgnoreCase("tamanho")) {
+            if (argumentos.length < 1) return true;
+            double valor = Double.parseDouble(argumentos[0]);
+            p.getAttribute(Attribute.GENERIC_SCALE).setBaseValue(valor);
+            p.sendMessage("§aSeu tamanho agora é " + valor);
+            return true;
+        }
+
+        // COMANDO /PVP
+        if (cmd.getName().equalsIgnoreCase("pvp")) {
+            if (pvpOff.contains(p.getName())) {
+                pvpOff.remove(p.getName());
+                p.sendMessage("§cSeu PvP foi ATIVADO!");
+            } else {
+                pvpOff.add(p.getName());
+                p.sendMessage("§aSeu PvP foi DESATIVADO!");
+            }
+            return true;
+        }
+        
+        // COMANDO /SC (Staff Chat)
         if (cmd.getName().equalsIgnoreCase("sc")) {
-            if (args.length == 0) return false;
-            String msg = String.join(" ", args);
-            String formato = ChatColor.translateAlternateColorCodes('&', "&d[STAFF] &b" + p.getName() + ": &f" + msg);
-            Bukkit.getOnlinePlayers().stream().filter(s -> s.hasPermission("humanangel.staff")).forEach(s -> s.sendMessage(formato));
+            String mensagem = String.join(" ", argumentos);
+            for (Player staff : Bukkit.getOnlinePlayers()) {
+                if (staff.hasPermission("humanangel.staff")) {
+                    staff.sendMessage("§d[StaffChat] " + p.getName() + ": §f" + mensagem);
+                }
+            }
             return true;
         }
 
-        if (cmd.getName().equalsIgnoreCase("spawn")) {
-            p.sendMessage(ChatColor.YELLOW + "Aguarde 5 segundos parado...");
-            int task = Bukkit.getScheduler().runTaskLater(this, () -> {
-                p.teleport(p.getWorld().getSpawnLocation());
-                p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
-                p.sendMessage(ChatColor.GREEN + "Teleportado!");
-                teleportando.remove(p.getUniqueId());
-            }, 100L).getTaskId();
-            teleportando.put(p.getUniqueId(), task);
-            return true;
-        }
         return false;
     }
 
     @EventHandler
-    public void onMove(PlayerMoveEvent e) {
-        if (teleportando.containsKey(e.getPlayer().getUniqueId())) {
-            if (e.getFrom().getBlockX() != e.getTo().getBlockX() || e.getFrom().getBlockZ() != e.getTo().getBlockZ()) {
-                Bukkit.getScheduler().cancelTask(teleportando.get(e.getPlayer().getUniqueId()));
-                teleportando.remove(e.getPlayer().getUniqueId());
-                e.getPlayer().sendMessage(ChatColor.RED + "Você se moveu! Teleporte cancelado.");
+    public void aoBater(EntityDamageByEntityEvent evento) {
+        if (evento.getDamager() instanceof Player && evento.getEntity() instanceof Player) {
+            if (pvpOff.contains(evento.getDamager().getName()) || pvpOff.contains(evento.getEntity().getName())) {
+                evento.setCancelled(true);
+                evento.getDamager().sendMessage("§cO combate está desligado para um de vocês!");
             }
         }
     }
