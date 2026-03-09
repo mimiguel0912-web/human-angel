@@ -1,19 +1,23 @@
 name: HumanAngel
-version: 1.0
+version: 1.2
 main: com.humanangel.Main
 api-version: 1.21
 commands:
+  # Comandos da Versão 1.0/1.1
   sc:
-    description: Chat exclusivo da Staff.
-    permission: humanangel.staff
+    description: Chat exclusivo da staff.
   spawn:
-    description: Teleporta para o início.
+    description: Teleporta para o spawn.
   ha:
-    description: Comando principal do Human Angel.
-permissions:
-  humanangel.staff:
-    description: Permite ver o chat da staff.
-    default: op
-  humanangel.admin:
-    description: Permite gerenciar o plugin.
-    default: op
+    description: Comando principal (reload).
+  zoeira:
+    description: Gerencia as frases de zoeira.
+
+  # Comandos Novos da Versão 1.2
+  mode:
+    description: Muda o modo de jogo rapidamente.
+  tamanho:
+    description: Altera o tamanho do jogador (escala).
+  pvp:
+    description: Liga ou desliga o seu PvP.
+    
