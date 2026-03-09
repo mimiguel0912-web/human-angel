@@ -6,7 +6,7 @@
 
     <groupId>com.humanangel</groupId>
     <artifactId>HumanAngel</artifactId>
-    <version>1.2beta</version>
+    <version>1.2</version>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
