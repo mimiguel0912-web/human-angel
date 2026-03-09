@@ -27,7 +27,6 @@ public class Main extends JavaPlugin implements Listener {
     public void onEnable() {
         Bukkit.getPluginManager().registerEvents(this, this);
         
-        // CLEAR LAG AUTOMÁTICO (A cada 10 minutos)
         Bukkit.getScheduler().runTaskTimer(this, () -> {
             int removidos = 0;
             for (World mundo : Bukkit.getWorlds()) {
@@ -38,7 +37,9 @@ public class Main extends JavaPlugin implements Listener {
                     }
                 }
             }
-            Bukkit.broadcastMessage("§6[HumanAngel] §fLimpeza: §e" + removidos + " itens §fremovidos do chão.");
+            if (removidos > 0) {
+                Bukkit.broadcastMessage("§6[HumanAngel] §fLimpeza: §e" + removidos + " itens §fremovidos.");
+            }
         }, 0L, 12000L);
 
         getLogger().info("Human Angel v1.2 - TUDO ATIVADO!");
@@ -46,25 +47,23 @@ public class Main extends JavaPlugin implements Listener {
 
     @EventHandler
     public void aoEntrar(PlayerJoinEvent e) {
-        // ANTI-VPN SIMPLES
         Player p = e.getPlayer();
         String host = p.getAddress().getHostName().toLowerCase();
-        if (host.contains("proxy") || host.contains("vpn") || host.contains("cloud")) {
-            p.kickPlayer("§cVPN/Proxy não permitida!");
+        if (host.contains("proxy") || host.contains("vpn")) {
+            p.kickPlayer("§cVPN nao permitida!");
         }
     }
 
     @EventHandler
     public void noMobLag(EntitySpawnEvent e) {
-        // Se houver mais de 50 entidades perto, cancela o spawn
-        if (e.getEntity().getLocation().getNearbyEntities(20, 20, 20).size() > 50) {
+        // CORREÇÃO DO ERRO: Usando double em vez de int para a 1.21
+        if (e.getEntity().getLocation().getNearbyEntities(20.0, 20.0, 20.0).size() > 50) {
             e.setCancelled(true);
         }
     }
 
     @EventHandler
     public void usarTridente(PlayerInteractEvent e) {
-        // FERRAMENTA TRIDENTE (WorldEdit)
         ItemStack item = e.getItem();
         if (item != null && item.getType() == Material.TRIDENT && item.hasItemMeta()) {
             if (item.getItemMeta().getDisplayName().contains("Tridente do Arcanjo")) {
@@ -72,13 +71,13 @@ public class Main extends JavaPlugin implements Listener {
                 if (e.getAction().name().contains("LEFT_CLICK")) {
                     if (e.getClickedBlock() != null) {
                         pos1.put(p.getUniqueId(), e.getClickedBlock().getLocation());
-                        p.sendMessage("§b[HumanAngel] §fPosição 1 definida!");
+                        p.sendMessage("§b[HumanAngel] §fPosicao 1 definida!");
                         e.setCancelled(true);
                     }
                 } else if (e.getAction().name().contains("RIGHT_CLICK")) {
                     if (e.getClickedBlock() != null) {
                         pos2.put(p.getUniqueId(), e.getClickedBlock().getLocation());
-                        p.sendMessage("§b[HumanAngel] §fPosição 2 definida!");
+                        p.sendMessage("§b[HumanAngel] §fPosicao 2 definida!");
                         e.setCancelled(true);
                     }
                 }
@@ -87,38 +86,29 @@ public class Main extends JavaPlugin implements Listener {
     }
 
     @Override
-    public boolean onCommand(CommandSender remetente, Command cmd, String label, String[] argumentos) {
-        if (!(remetente instanceof Player)) return true;
-        Player p = (Player) remetente;
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+        if (!(sender instanceof Player)) return true;
+        Player p = (Player) sender;
 
-        // /MODE <NICK> <C/S/A/SP>
         if (cmd.getName().equalsIgnoreCase("mode")) {
-            if (argumentos.length < 2) {
-                p.sendMessage("§eUse: /mode <nick> <c/s/a/sp>");
-                return true;
-            }
-            Player alvo = Bukkit.getPlayer(argumentos[0]);
+            if (args.length < 2) return true;
+            Player alvo = Bukkit.getPlayer(args[0]);
             if (alvo == null) return true;
-            switch (argumentos[1].toLowerCase()) {
-                case "c": alvo.setGameMode(GameMode.CREATIVE); break;
-                case "s": alvo.setGameMode(GameMode.SURVIVAL); break;
-                case "a": alvo.setGameMode(GameMode.ADVENTURE); break;
-                case "sp": alvo.setGameMode(GameMode.SPECTATOR); break;
-            }
+            if (args[1].equalsIgnoreCase("c")) alvo.setGameMode(GameMode.CREATIVE);
+            if (args[1].equalsIgnoreCase("s")) alvo.setGameMode(GameMode.SURVIVAL);
+            if (args[1].equalsIgnoreCase("sp")) alvo.setGameMode(GameMode.SPECTATOR);
             p.sendMessage("§aModo de " + alvo.getName() + " alterado.");
             return true;
         }
 
-        // /TAMANHO <VALOR>
         if (cmd.getName().equalsIgnoreCase("tamanho")) {
-            if (argumentos.length < 1) return true;
-            double valor = Double.parseDouble(argumentos[0]);
+            if (args.length < 1) return true;
+            double valor = Double.parseDouble(args[0]);
             p.getAttribute(Attribute.GENERIC_SCALE).setBaseValue(valor);
-            p.sendMessage("§aSeu tamanho agora é " + valor);
+            p.sendMessage("§aTamanho definido para " + valor);
             return true;
         }
 
-        // /PVP
         if (cmd.getName().equalsIgnoreCase("pvp")) {
             if (pvpOff.contains(p.getName())) {
                 pvpOff.remove(p.getName());
@@ -130,7 +120,6 @@ public class Main extends JavaPlugin implements Listener {
             return true;
         }
 
-        // /ANGELWAND (Pega o Tridente)
         if (cmd.getName().equalsIgnoreCase("angelwand")) {
             ItemStack tridente = new ItemStack(Material.TRIDENT);
             ItemMeta meta = tridente.getItemMeta();
@@ -138,18 +127,17 @@ public class Main extends JavaPlugin implements Listener {
             meta.setLore(Arrays.asList("§7Clique Esquerdo: Pos 1", "§7Clique Direito: Pos 2"));
             tridente.setItemMeta(meta);
             p.getInventory().addItem(tridente);
-            p.sendMessage("§aVocê recebeu a ferramenta sagrada!");
+            p.sendMessage("§aVoce recebeu a ferramenta!");
             return true;
         }
 
-        // /CONTROL (Menu de Inventários)
         if (cmd.getName().equalsIgnoreCase("control")) {
-            Inventory menu = Bukkit.createInventory(null, 54, "§0Controle de Jogadores");
+            Inventory menu = Bukkit.createInventory(null, 54, "§0Controle");
             for (Player online : Bukkit.getOnlinePlayers()) {
                 ItemStack itemMenu = new ItemStack(Material.PLAYER_HEAD);
-                ItemMeta metaMenu = itemMenu.getItemMeta();
-                metaMenu.setDisplayName("§e" + online.getName());
-                itemMenu.setItemMeta(metaMenu);
+                ItemMeta m = itemMenu.getItemMeta();
+                m.setDisplayName("§e" + online.getName());
+                itemMenu.setItemMeta(m);
                 menu.addItem(itemMenu);
             }
             p.openInventory(menu);
@@ -160,12 +148,11 @@ public class Main extends JavaPlugin implements Listener {
     }
 
     @EventHandler
-    public void aoBater(EntityDamageByEntityEvent evento) {
-        if (evento.getDamager() instanceof Player && evento.getEntity() instanceof Player) {
-            if (pvpOff.contains(evento.getDamager().getName()) || pvpOff.contains(evento.getEntity().getName())) {
-                evento.setCancelled(true);
-                evento.getDamager().sendMessage("§cO combate está desligado!");
+    public void aoBater(EntityDamageByEntityEvent e) {
+        if (e.getDamager() instanceof Player && e.getEntity() instanceof Player) {
+            if (pvpOff.contains(e.getDamager().getName()) || pvpOff.contains(e.getEntity().getName())) {
+                e.setCancelled(true);
             }
         }
     }
-    }
+}
