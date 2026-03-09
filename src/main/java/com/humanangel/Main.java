@@ -15,7 +15,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
-
 import java.util.*;
 
 public class Main extends JavaPlugin implements Listener {
@@ -57,7 +56,7 @@ public class Main extends JavaPlugin implements Listener {
 
     @EventHandler
     public void noMobLag(EntitySpawnEvent e) {
-        // Se houver mais de 50 entidades perto (Raio de 20 blocos), cancela o spawn
+        // Se houver mais de 50 entidades perto, cancela o spawn
         if (e.getEntity().getLocation().getNearbyEntities(20, 20, 20).size() > 50) {
             e.setCancelled(true);
         }
@@ -143,12 +142,15 @@ public class Main extends JavaPlugin implements Listener {
             return true;
         }
 
-        // /CONTROL (Menu básico)
+        // /CONTROL (Menu de Inventários)
         if (cmd.getName().equalsIgnoreCase("control")) {
             Inventory menu = Bukkit.createInventory(null, 54, "§0Controle de Jogadores");
             for (Player online : Bukkit.getOnlinePlayers()) {
-                ItemStack cabeca = new ItemStack(Material.PLAYER_HEAD);
-                menu.addItem(cabeca);
+                ItemStack itemMenu = new ItemStack(Material.PLAYER_HEAD);
+                ItemMeta metaMenu = itemMenu.getItemMeta();
+                metaMenu.setDisplayName("§e" + online.getName());
+                itemMenu.setItemMeta(metaMenu);
+                menu.addItem(itemMenu);
             }
             p.openInventory(menu);
             return true;
@@ -166,4 +168,4 @@ public class Main extends JavaPlugin implements Listener {
             }
         }
     }
-}
+    }
