@@ -56,8 +56,8 @@ public class Main extends JavaPlugin implements Listener {
 
     @EventHandler
     public void noMobLag(EntitySpawnEvent e) {
-        // CORREÇÃO DO ERRO: Usando double em vez de int para a 1.21
-        if (e.getEntity().getLocation().getNearbyEntities(20.0, 20.0, 20.0).size() > 50) {
+        // MUDANÇA AQUI: Forma mais compatível de contar entidades
+        if (e.getEntity().getNearbyEntities(20, 20, 20).size() > 50) {
             e.setCancelled(true);
         }
     }
@@ -103,9 +103,11 @@ public class Main extends JavaPlugin implements Listener {
 
         if (cmd.getName().equalsIgnoreCase("tamanho")) {
             if (args.length < 1) return true;
-            double valor = Double.parseDouble(args[0]);
-            p.getAttribute(Attribute.GENERIC_SCALE).setBaseValue(valor);
-            p.sendMessage("§aTamanho definido para " + valor);
+            try {
+                double valor = Double.parseDouble(args[0]);
+                p.getAttribute(Attribute.GENERIC_SCALE).setBaseValue(valor);
+                p.sendMessage("§aTamanho definido para " + valor);
+            } catch (Exception err) { p.sendMessage("§cUse um numero!"); }
             return true;
         }
 
@@ -123,9 +125,11 @@ public class Main extends JavaPlugin implements Listener {
         if (cmd.getName().equalsIgnoreCase("angelwand")) {
             ItemStack tridente = new ItemStack(Material.TRIDENT);
             ItemMeta meta = tridente.getItemMeta();
-            meta.setDisplayName("§b§lTridente do Arcanjo (Edit)");
-            meta.setLore(Arrays.asList("§7Clique Esquerdo: Pos 1", "§7Clique Direito: Pos 2"));
-            tridente.setItemMeta(meta);
+            if (meta != null) {
+                meta.setDisplayName("§b§lTridente do Arcanjo (Edit)");
+                meta.setLore(Arrays.asList("§7Clique Esquerdo: Pos 1", "§7Clique Direito: Pos 2"));
+                tridente.setItemMeta(meta);
+            }
             p.getInventory().addItem(tridente);
             p.sendMessage("§aVoce recebeu a ferramenta!");
             return true;
@@ -136,8 +140,10 @@ public class Main extends JavaPlugin implements Listener {
             for (Player online : Bukkit.getOnlinePlayers()) {
                 ItemStack itemMenu = new ItemStack(Material.PLAYER_HEAD);
                 ItemMeta m = itemMenu.getItemMeta();
-                m.setDisplayName("§e" + online.getName());
-                itemMenu.setItemMeta(m);
+                if (m != null) {
+                    m.setDisplayName("§e" + online.getName());
+                    itemMenu.setItemMeta(m);
+                }
                 menu.addItem(itemMenu);
             }
             p.openInventory(menu);
@@ -155,4 +161,4 @@ public class Main extends JavaPlugin implements Listener {
             }
         }
     }
-}
+                }
