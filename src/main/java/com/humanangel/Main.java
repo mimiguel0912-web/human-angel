@@ -19,21 +19,37 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
     private Map<UUID, Location> pos1 = new HashMap<>(), pos2 = new HashMap<>();
     private Map<UUID, Location> homes = new HashMap<>();
     private Map<String, Region> regions = new HashMap<>();
+    private Map<UUID, UUID> tpaRequests = new HashMap<>();
     private List<String> zoeiraList = new ArrayList<>();
+    private List<String> avisosServidor = new ArrayList<>();
 
     @Override
     public void onEnable() {
         getServer().getPluginManager().registerEvents(this, this);
-        String[] cmds = {"modo", "sc", "ha", "home", "sethome", "spawn", "lista", "set", "paredes", "pos1", "pos2", "angelwand", "clearlag", "rg", "control", "zoeira"};
+        String[] cmds = {"modo", "sc", "ha", "home", "sethome", "spawn", "lista", "set", "paredes", "pos1", "pos2", "angelwand", "clearlag", "rg", "control", "zoeira", "tpa", "tpaccept", "tpadeny", "avisos", "rglista"};
         for (String s : cmds) {
             PluginCommand pc = getCommand(s);
             if (pc != null) pc.setExecutor(this);
         }
         
+        // ClearLag - 15 minutos
         new BukkitRunnable() {
             @Override
             public void run() { limparItens(); }
         }.runTaskTimer(this, 18000L, 18000L);
+
+        // Sistema de Avisos Automáticos - A cada 2 horas (144.000 ticks)
+        new BukkitRunnable() {
+            int index = 0;
+            @Override
+            public void run() {
+                if (!avisosServidor.isEmpty()) {
+                    if (index >= avisosServidor.size()) index = 0;
+                    Bukkit.broadcastMessage("§b§l[AVISO] §f" + ChatColor.translateAlternateColorCodes('&', avisosServidor.get(index)));
+                    index++;
+                }
+            }
+        }.runTaskTimer(this, 144000L, 144000L);
     }
 
     @Override
@@ -42,48 +58,75 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
         Player p = (Player) sender;
         String c = cmd.getName().toLowerCase();
 
-        if (Arrays.asList("modo", "sc", "set", "paredes", "angelwand", "clearlag", "rg", "control", "zoeira").contains(c) && !p.isOp()) {
+        // Verificação de permissão OP para comandos admin
+        if (Arrays.asList("modo", "sc", "set", "paredes", "angelwand", "clearlag", "rg", "control", "zoeira", "avisos").contains(c) && !p.isOp()) {
             p.sendMessage("§cSem permissão!"); return true;
         }
 
         switch (c) {
             case "ha": p.sendMessage("§b§lHUMAN ANGEL §fv1.4.0"); break;
 
-            case "control":
-                openControlMenu(p);
-                break;
-
-            case "zoeira":
-                if (args.length == 0) { p.sendMessage("§e/zoeira [add/remove/list]"); return true; }
-                if (args[0].equalsIgnoreCase("add") && args.length > 1) {
-                    zoeiraList.add(args[1].toLowerCase()); p.sendMessage("§aBloqueado!");
-                } else if (args[0].equalsIgnoreCase("remove") && args.length > 1) {
-                    zoeiraList.remove(args[1].toLowerCase()); p.sendMessage("§cRemovido!");
+            case "avisos":
+                if (args.length == 0) { p.sendMessage("§e/avisos [add/remove/list] [mensagem]"); return true; }
+                if (args[0].equalsIgnoreCase("add")) {
+                    avisosServidor.add(String.join(" ", Arrays.copyOfRange(args, 1, args.length)));
+                    p.sendMessage("§aAviso adicionado!");
+                } else if (args[0].equalsIgnoreCase("remove")) {
+                    try { avisosServidor.remove(Integer.parseInt(args[1])); p.sendMessage("§cAviso removido!"); } catch(Exception e) { p.sendMessage("§cUse o ID da lista."); }
                 } else if (args[0].equalsIgnoreCase("list")) {
-                    p.sendMessage("§eFiltro: §f" + String.join(", ", zoeiraList));
+                    p.sendMessage("§b§l--- LISTA DE AVISOS ---");
+                    for (int i=0; i<avisosServidor.size(); i++) p.sendMessage("§e" + i + ": §f" + avisosServidor.get(i));
                 }
                 break;
 
-            case "rg":
-                if (args.length < 2) { p.sendMessage("§e/rg define [nome] | flag [nome] [flag] [allow/deny]"); return true; }
-                if (args[0].equalsIgnoreCase("define")) {
-                    Location l1 = pos1.get(p.getUniqueId()), l2 = pos2.get(p.getUniqueId());
-                    if (l1 == null || l2 == null) p.sendMessage("§cMarque as posições!");
-                    else { regions.put(args[1], new Region(l1, l2)); p.sendMessage("§aRegião salva!"); }
-                } else if (args[0].equalsIgnoreCase("flag") && args.length >= 4) {
-                    Region r = regions.get(args[1]);
-                    if (r != null) { r.flags.put(args[2].toLowerCase(), args[3].equalsIgnoreCase("allow")); p.sendMessage("§aFlag alterada!"); }
-                }
+            case "rglista":
+                p.sendMessage("§b§l--- REGIÕES REGISTRADAS ---");
+                if (regions.isEmpty()) p.sendMessage("§7Nenhuma região criada.");
+                else for (String name : regions.keySet()) p.sendMessage("§f- " + name);
                 break;
 
-            case "sc":
-                Bukkit.broadcast("§d§l[STAFF] §f" + p.getName() + ": §7" + String.join(" ", args), Server.BROADCAST_CHANNEL_ADMINISTRATIVE);
+            case "tpa":
+                if (args.length == 0) { p.sendMessage("§eUse: /tpa [nick]"); return true; }
+                Player targetTpa = Bukkit.getPlayer(args[0]);
+                if (targetTpa == null) { p.sendMessage("§cOffline!"); return true; }
+                tpaRequests.put(targetTpa.getUniqueId(), p.getUniqueId());
+                p.sendMessage("§aPedido enviado para " + targetTpa.getName());
+                targetTpa.sendMessage("§e" + p.getName() + " quer ir até você. /tpaccept ou /tpadeny");
                 break;
 
-            case "angelwand":
-                p.getInventory().addItem(new ItemStack(Material.WOODEN_AXE));
-                p.sendMessage("§bMachado entregue!");
+            case "tpaccept":
+                if (tpaRequests.containsKey(p.getUniqueId())) {
+                    Player requester = Bukkit.getPlayer(tpaRequests.get(p.getUniqueId()));
+                    if (requester != null) { requester.teleport(p.getLocation()); requester.sendMessage("§aTeleportado!"); }
+                    tpaRequests.remove(p.getUniqueId());
+                } else p.sendMessage("§cSem pedidos.");
                 break;
+
+            case "tpadeny":
+                tpaRequests.remove(p.getUniqueId()); p.sendMessage("§cRecusado."); break;
+
+            case "set":
+                fill(p, args, false); break;
+            case "paredes":
+                fill(p, args, true); break;
+
+            case "lista":
+                p.sendMessage("§b§l--- MEUS COMANDOS ---");
+                p.sendMessage("§f/home, /sethome, /spawn, /tpa, /tpaccept, /tpadeny, /lista");
+                if (p.isOp()) p.sendMessage("§eAdmin: /modo, /sc, /set, /paredes, /rg, /rglista, /control, /zoeira, /avisos");
+                break;
+
+            case "home":
+                if (homes.containsKey(p.getUniqueId())) p.teleport(homes.get(p.getUniqueId()));
+                else p.sendMessage("§c§lERRO: §fVocê não tem uma home salva! Use /sethome");
+                break;
+
+            case "sethome":
+                homes.put(p.getUniqueId(), p.getLocation()); p.sendMessage("§aHome salva com sucesso!"); break;
+
+            case "spawn": p.teleport(p.getWorld().getSpawnLocation()); p.sendMessage("§aIndo para o Spawn!"); break;
+
+            case "control": openControlMenu(p); break;
 
             case "modo":
                 if (args.length > 0) {
@@ -93,22 +136,37 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
                     p.sendMessage("§aModo alterado!");
                 } break;
 
-            case "home": if(homes.containsKey(p.getUniqueId())) p.teleport(homes.get(p.getUniqueId())); break;
-            case "sethome": homes.put(p.getUniqueId(), p.getLocation()); p.sendMessage("§aHome salva!"); break;
-            case "spawn": p.teleport(p.getWorld().getSpawnLocation()); break;
+            case "angelwand":
+                p.getInventory().addItem(new ItemStack(Material.WOODEN_AXE));
+                p.sendMessage("§bMachado entregue!"); break;
+            
             case "clearlag": limparItens(); break;
         }
         return true;
     }
 
-    // --- MENU CONTROL ---
+    private void fill(Player p, String[] args, boolean walls) {
+        Location l1 = pos1.get(p.getUniqueId()), l2 = pos2.get(p.getUniqueId());
+        if (l1 == null || l2 == null || args.length == 0) { p.sendMessage("§cMarque Pos 1 e Pos 2!"); return; }
+        Material mat = Material.matchMaterial(args[0].toUpperCase());
+        if (mat == null) { p.sendMessage("§cBloco inválido!"); return; }
+        int minX = Math.min(l1.getBlockX(), l2.getBlockX()), maxX = Math.max(l1.getBlockX(), l2.getBlockX());
+        int minY = Math.min(l1.getBlockY(), l2.getBlockY()), maxY = Math.max(l1.getBlockY(), l2.getBlockY());
+        int minZ = Math.min(l1.getBlockZ(), l2.getBlockZ()), maxZ = Math.max(l1.getBlockZ(), l2.getBlockZ());
+        for (int x = minX; x <= maxX; x++) for (int y = minY; y <= maxY; y++) for (int z = minZ; z <= maxZ; z++) {
+            if (walls && (x > minX && x < maxX && z > minZ && z < maxZ)) continue;
+            p.getWorld().getBlockAt(x, y, z).setType(mat);
+        }
+        p.sendMessage("§aBlocos alterados!");
+    }
+
+    // --- GUI CONTROL ---
     private void openControlMenu(Player p) {
         Inventory inv = Bukkit.createInventory(null, 54, "§0Controle de Jogadores");
         for (Player online : Bukkit.getOnlinePlayers()) {
             ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
             ItemMeta meta = skull.getItemMeta();
             meta.setDisplayName("§e" + online.getName());
-            meta.setLore(Arrays.asList("§7Clique para ver o inventário"));
             skull.setItemMeta(meta);
             inv.addItem(skull);
         }
@@ -119,41 +177,10 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
     public void onInventoryClick(InventoryClickEvent e) {
         if (e.getView().getTitle().equals("§0Controle de Jogadores")) {
             e.setCancelled(true);
-            if (e.getCurrentItem() == null || e.getCurrentItem().getType() != Material.PLAYER_HEAD) return;
-            String name = ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName());
-            Player target = Bukkit.getPlayer(name);
-            if (target != null) {
-                e.getWhoClicked().openInventory(target.getInventory());
-            }
+            if (e.getCurrentItem() == null) return;
+            Player target = Bukkit.getPlayer(ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName()));
+            if (target != null) e.getWhoClicked().openInventory(target.getInventory());
         }
-    }
-
-    @EventHandler
-    public void onChat(AsyncPlayerChatEvent e) {
-        String msg = e.getMessage().toLowerCase();
-        for (String s : zoeiraList) {
-            if (msg.contains(s)) { e.setCancelled(true); e.getPlayer().sendMessage("§cPalavra proibida!"); return; }
-        }
-    }
-
-    // Proteção de Região
-    @EventHandler
-    public void onBreak(BlockBreakEvent e) { if (!canDo(e.getPlayer(), e.getBlock().getLocation(), "build")) e.setCancelled(true); }
-    @EventHandler
-    public void onPlace(BlockPlaceEvent e) { if (!canDo(e.getPlayer(), e.getBlock().getLocation(), "build")) e.setCancelled(true); }
-
-    private boolean canDo(Player p, Location loc, String flag) {
-        if (p.isOp()) return true;
-        for (Region r : regions.values()) if (r.isInside(loc)) return r.flags.getOrDefault(flag, true);
-        return true;
-    }
-
-    private void limparItens() {
-        int i = 0;
-        for (World w : Bukkit.getWorlds()) {
-            for (Entity en : w.getEntities()) if (en instanceof Item) { en.remove(); i++; }
-        }
-        Bukkit.broadcastMessage("§e§l[ClearLag] §6" + i + " §fitens limpos.");
     }
 
     @EventHandler
@@ -161,11 +188,17 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
         Player p = e.getPlayer();
         if (p.getInventory().getItemInMainHand().getType() == Material.WOODEN_AXE && p.isOp()) {
             if (e.getAction() == Action.LEFT_CLICK_BLOCK) {
-                e.setCancelled(true); pos1.put(p.getUniqueId(), e.getClickedBlock().getLocation()); p.sendMessage("§bPos 1!");
+                e.setCancelled(true); pos1.put(p.getUniqueId(), e.getClickedBlock().getLocation()); p.sendMessage("§bPos 1 marcada!");
             } else if (e.getAction() == Action.RIGHT_CLICK_BLOCK) {
-                e.setCancelled(true); pos2.put(p.getUniqueId(), e.getClickedBlock().getLocation()); p.sendMessage("§dPos 2!");
+                e.setCancelled(true); pos2.put(p.getUniqueId(), e.getClickedBlock().getLocation()); p.sendMessage("§dPos 2 marcada!");
             }
         }
+    }
+
+    private void limparItens() {
+        int i = 0;
+        for (World w : Bukkit.getWorlds()) for (Entity en : w.getEntities()) if (en instanceof Item) { en.remove(); i++; }
+        Bukkit.broadcastMessage("§e§l[ClearLag] §fForam limpos §6" + i + " §fitens.");
     }
 
     class Region {
@@ -178,4 +211,4 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
             return l.getWorld().equals(min.getWorld()) && l.getX() >= min.getX() && l.getX() <= max.getX() && l.getZ() >= min.getZ() && l.getZ() <= max.getZ();
         }
     }
-                }
+}
