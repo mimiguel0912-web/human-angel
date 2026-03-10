@@ -29,7 +29,6 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
             if (pc != null) pc.setExecutor(this);
         }
         
-        // Sistema de Avisos 2h
         Bukkit.getScheduler().runTaskTimer(this, () -> {
             if (!zoeiraMessages.isEmpty()) {
                 String msg = zoeiraMessages.get(new Random().nextInt(zoeiraMessages.size()));
@@ -44,7 +43,6 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
         Player p = (Player) sender;
         String c = cmd.getName().toLowerCase();
 
-        // Trava de ADM (Apenas OP)
         if (Arrays.asList("mode", "control", "sc", "ha", "angelwand", "set", "paredes", "zoeira").contains(c)) {
             if (!p.isOp()) { p.sendMessage("§cSem permissão!"); return true; }
         }
@@ -69,8 +67,8 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
                 ItemMeta m = t.getItemMeta(); m.setDisplayName("§b§lAngel Wand"); t.setItemMeta(m);
                 p.getInventory().addItem(t);
                 break;
-            case "set": fillArea(p, (args.length > 0 ? Material.matchMaterial(args[0]) : null), false); break;
-            case "paredes": fillArea(p, (args.length > 0 ? Material.matchMaterial(args[0]) : null), true); break;
+            case "set": fillArea(p, (args.length > 0 ? Material.matchMaterial(args[0].toUpperCase()) : null), false); break;
+            case "paredes": fillArea(p, (args.length > 0 ? Material.matchMaterial(args[0].toUpperCase()) : null), true); break;
             case "control":
                 Inventory inv = Bukkit.createInventory(null, 54, "§0Controle");
                 for (Player o : Bukkit.getOnlinePlayers()) {
@@ -94,7 +92,7 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
 
     private void fillArea(Player p, Material mat, boolean walls) {
         Location l1 = pos1.get(p.getUniqueId()), l2 = pos2.get(p.getUniqueId());
-        if (l1 == null || l2 == null || mat == null) { p.sendMessage("§cUse o tridente primeiro!"); return; }
+        if (l1 == null || l2 == null || mat == null) { p.sendMessage("§cUse o tridente primeiro e o nome do bloco em inglês!"); return; }
         int minX = Math.min(l1.getBlockX(), l2.getBlockX()), maxX = Math.max(l1.getBlockX(), l2.getBlockX());
         int minY = Math.min(l1.getBlockY(), l2.getBlockY()), maxY = Math.max(l1.getBlockY(), l2.getBlockY());
         int minZ = Math.min(l1.getBlockZ(), l2.getBlockZ()), maxZ = Math.max(l1.getBlockZ(), l2.getBlockZ());
@@ -126,7 +124,7 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
         if (e.getView().getTitle().equals("§0Controle") && e.getCurrentItem() != null) {
             e.setCancelled(true);
             Player target = Bukkit.getPlayer(ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName()));
-            if (target != null) e.getWhoClicked().openInventory(target.getInventory());}
+            if (target != null) e.getWhoClicked().openInventory(target.getInventory());
         }
     }
 }
