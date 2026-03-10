@@ -14,8 +14,7 @@ import java.util.*;
 
 public class Main extends JavaPlugin implements CommandExecutor, Listener {
 
-    private boolean pvpEnabled = true;
-    private long lastPvpToggle = 0;
+    private Map<UUID, Boolean> pvpState = new HashMap<>(); // PvP por jogador
     private Map<UUID, Long> inCombat = new HashMap<>();
     private List<UUID> scActive = new ArrayList<>();
     private Map<UUID, Location> pos1 = new HashMap<>(), pos2 = new HashMap<>();
@@ -32,15 +31,13 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
             if (pc != null) pc.setExecutor(this);
         }
         
-        // Loop de Avisos /zoeira a cada 2 horas
+        // Avisos automáticos (2 horas)
         Bukkit.getScheduler().runTaskTimer(this, () -> {
             if (!zoeiraMessages.isEmpty()) {
                 String msg = zoeiraMessages.get(new Random().nextInt(zoeiraMessages.size()));
                 Bukkit.broadcastMessage("§6§l[AVISO] §f" + ChatColor.translateAlternateColorCodes('&', msg));
             }
         }, 144000L, 144000L);
-
-        startTasks();
     }
 
     @Override
@@ -49,68 +46,84 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
         Player p = (Player) sender;
         String c = cmd.getName().toLowerCase();
 
-        // Bloqueio de ADM
+        // Bloqueio ADM (Somente OP)
         if (Arrays.asList("mode", "control", "sc", "ha", "angelwand", "set", "paredes", "zoeira").contains(c)) {
             if (!p.isOp()) { p.sendMessage("§cSem permissão!"); return true; }
         }
 
         switch (c) {
-            case "ha": p.sendMessage("§b§lHUMAN ANGEL §fv1.3 - Ativo!"); break;
+            case "ha": p.sendMessage("§b§lHUMAN ANGEL §fv1.4"); break;
+            case "home":
+                if (!homes.containsKey(p.getUniqueId())) {
+                    p.sendMessage("§cVocê não tem uma home!!");
+                } else {
+                    p.teleport(homes.get(p.getUniqueId()));
+                    p.sendMessage("§aTeleportado para sua home!");
+                }
+                break;
+            case "sethome":
+                homes.put(p.getUniqueId(), p.getLocation());
+                p.sendMessage("§aHome definida com sucesso!");
+                break;
+            case "pvp": // PvP por Jogador
+                boolean atual = pvpState.getOrDefault(p.getUniqueId(), true);
+                pvpState.put(p.getUniqueId(), !atual);
+                p.sendMessage(!atual ? "§aSeu PvP agora está LIGADO!" : "§cSeu PvP agora está DESLIGADO!");
+                break;
+            case "control": // Correção do Menu
+                Inventory inv = Bukkit.createInventory(null, 54, "§0Controle de Players");
+                for (Player o : Bukkit.getOnlinePlayers()) {
+                    ItemStack head = new ItemStack(Material.PLAYER_HEAD);
+                    ItemMeta m = head.getItemMeta(); m.setDisplayName("§e" + o.getName()); head.setItemMeta(m);
+                    inv.addItem(head);
+                }
+                p.openInventory(inv);
+                break;
             case "zoeira":
                 if (args.length > 0) {
                     zoeiraMessages.add(String.join(" ", args));
-                    p.sendMessage("§aAviso salvo para o sistema de 2h!");
+                    p.sendMessage("§aAviso adicionado!");
                 } break;
-            case "set": fillArea(p, (args.length > 0 ? Material.matchMaterial(args[0]) : null), false); break;
-            case "paredes": fillArea(p, (args.length > 0 ? Material.matchMaterial(args[0]) : null), true); break;
-            case "home": p.teleport(homes.getOrDefault(p.getUniqueId(), p.getWorld().getSpawnLocation())); break;
-            case "sethome": homes.put(p.getUniqueId(), p.getLocation()); p.sendMessage("§aHome salva!"); break;
-            case "tpa":
-                if (args.length > 0) {
-                    Player t = Bukkit.getPlayer(args[0]);
-                    if (t != null) { tpaRequests.put(t.getUniqueId(), p.getUniqueId()); p.sendMessage("§ePedido enviado!"); }
-                } break;
-            case "tpaccept":
-                UUID req = tpaRequests.remove(p.getUniqueId());
-                if (req != null && Bukkit.getPlayer(req) != null) Bukkit.getPlayer(req).teleport(p.getLocation());
-                break;
-            case "angelwand":
-                ItemStack t = new ItemStack(Material.TRIDENT);
-                ItemMeta m = t.getItemMeta(); m.setDisplayName("§b§lAngel Wand"); t.setItemMeta(m);
-                p.getInventory().addItem(t); break;
         }
         return true;
     }
 
-    private void fillArea(Player p, Material mat, boolean walls) {
-        Location l1 = pos1.get(p.getUniqueId()), l2 = pos2.get(p.getUniqueId());
-        if (l1 == null || l2 == null || mat == null) { p.sendMessage("§cUse o tridente primeiro!"); return; }
-        int minX = Math.min(l1.getBlockX(), l2.getBlockX()), maxX = Math.max(l1.getBlockX(), l2.getBlockX());
-        int minY = Math.min(l1.getBlockY(), l2.getBlockY()), maxY = Math.max(l1.getBlockY(), l2.getBlockY());
-        int minZ = Math.min(l1.getBlockZ(), l2.getBlockZ()), maxZ = Math.max(l1.getBlockZ(), l2.getBlockZ());
-        for (int x = minX; x <= maxX; x++) for (int y = minY; y <= maxY; y++) for (int z = minZ; z <= maxZ; z++) {
-            if (walls && (x > minX && x < maxX && z > minZ && z < maxZ)) continue;
-            p.getWorld().getBlockAt(x, y, z).setType(mat);
+    @EventHandler
+    public void onDamage(EntityDamageByEntityEvent e) {
+        if (e.getEntity() instanceof Player && e.getDamager() instanceof Player) {
+            Player vitima = (Player) e.getEntity();
+            Player atacante = (Player) e.getDamager();
+            // Se um dos dois estiver com PvP OFF, cancela
+            if (!pvpState.getOrDefault(vitima.getUniqueId(), true) || !pvpState.getOrDefault(atacante.getUniqueId(), true)) {
+                e.setCancelled(true);
+                atacante.sendMessage("§cO PvP de um de vocês está desativado!");
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onChat(AsyncPlayerChatEvent e) {
+        // Melhora compatibilidade com Bedrock/Geyser
+        if (scActive.contains(e.getPlayer().getUniqueId())) {
+            e.setCancelled(true);
+            String msg = "§d[StaffChat] " + e.getPlayer().getName() + ": §f" + e.getMessage();
+            Bukkit.getConsoleSender().sendMessage(msg);
+            for (UUID id : scActive) {
+                Player s = Bukkit.getPlayer(id);
+                if (s != null) s.sendMessage(msg);
+            }
         }
     }
 
     @EventHandler
-    public void onInteract(PlayerInteractEvent e) {
-        if (e.getItem() != null && e.getItem().getType() == Material.TRIDENT && e.getItem().hasItemMeta() && e.getItem().getItemMeta().getDisplayName().contains("Angel Wand")) {
+    public void onInvClick(InventoryClickEvent e) {
+        if (e.getView().getTitle().equals("§0Controle de Players")) {
             e.setCancelled(true);
-            if (e.getAction().name().contains("LEFT")) pos1.put(e.getPlayer().getUniqueId(), e.getPlayer().getLocation());
-            else pos2.put(e.getPlayer().getUniqueId(), e.getPlayer().getLocation());
-            e.getPlayer().sendMessage("§bPosição marcada!");
-        }
-    }
-
-    private void startTasks() {
-        Bukkit.getScheduler().runTaskTimer(this, () -> {
-            for (World w : Bukkit.getWorlds()) {
-                List<Entity> ms = new ArrayList<>();
-                for (Entity en : w.getEntities()) if (en instanceof Monster) ms.add(en);
-                if (ms.size() > 50) for (int i = 0; i < ms.size()/2; i++) ms.get(i).remove();
+            if (e.getCurrentItem() != null && e.getCurrentItem().hasItemMeta()) {
+                String targetName = ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName());
+                Player target = Bukkit.getPlayer(targetName);
+                if (target != null) e.getWhoClicked().openInventory(target.getInventory());
             }
-        }, 600L, 600L);
+        }
     }
 }
