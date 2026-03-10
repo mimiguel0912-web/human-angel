@@ -1,40 +1,19 @@
 name: HumanAngel
-version: 1.3.5
+version: 1.4.1
 main: com.humanangel.Main
 api-version: 1.21
 commands:
-  ha:
-    description: "Versao do plugin"
-  modo:
-    description: "Alterna entre Criativo e Survival"
-  escala:
-    description: "Muda o tamanho do seu personagem"
-  sc:
-    description: "Chat exclusivo da Staff"
-  home:
-    description: "Teleporta para sua casa salva"
-  sethome:
-    description: "Define o local da sua casa"
-  pvp:
-    description: "Ativa ou desativa seu PvP pessoal"
-  spawn:
-    description: "Vai para o ponto inicial do mundo"
-  tpa:
-    description: "Solicita teleporte a um jogador"
-  tpaccept:
-    description: "Aceita um pedido de teleporte"
-  tpadeny:
-    description: "Recusa um pedido de teleporte"
-  lista:
-    description: "Mostra todos os comandos disponiveis"
-  set:
-    description: "Preenche a area selecionada com blocos"
-  paredes:
-    description: "Cria paredes em volta da selecao"
-  pos1:
-    description: "Marca a primeira posicao do WorldEdit"
-  pos2:
-    description: "Marca a segunda posicao do WorldEdit"
-  angelwand:
-    description: "Recebe o tridente de construcao"
-    
+  ha: { description: "Versao" }
+  modo: { description: "Troca o modo" }
+  sc: { description: "Chat Staff" }
+  home: { description: "Vai home" }
+  sethome: { description: "Salva home" }
+  spawn: { description: "Vai spawn" }
+  lista: { description: "Ver lista" }
+  set: { description: "WorldEdit" }
+  paredes: { description: "Cria paredes" }
+  pos1: { description: "Pos 1" }
+  pos2: { description: "Pos 2" }
+  angelwand: { description: "Pega Tridente" }
+  clearlag: { description: "Limpa o chao" }
+  
