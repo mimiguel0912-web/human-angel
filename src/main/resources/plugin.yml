@@ -1,24 +1,21 @@
 name: HumanAngel
-version: 1.2
+version: 1.3
 main: com.humanangel.Main
 api-version: 1.21
 commands:
-  sc:
-    description: "Chat exclusivo para a staff."
-  spawn:
-    description: "Teleporta para o ponto inicial."
-  mode:
-    description: "Muda o modo de jogo rapido (c,s,a,sp)."
-  tamanho:
-    description: "Altera a escala do jogador."
-  pvp:
-    description: "Ativa ou desativa o combate global."
-  angelwand:
-    description: "Pega o Tridente Arcanjo para edicao."
-  control:
-    description: "Abre o menu de controle de jogadores."
-  clearlag:
-    description: "Limpa os itens do chao manualmente."
-  ha:
-    description: "Comando principal do plugin."
-    
+  mode: { description: "ADM" }
+  control: { description: "ADM" }
+  sc: { description: "ADM" }
+  ha: { description: "ADM" }
+  zoeira: { description: "ADM - Avisos 2h" }
+  angelwand: { description: "ADM - Tridente" }
+  set: { description: "ADM - WorldEdit" }
+  paredes: { description: "ADM - WorldEdit" }
+  home: { description: "Player" }
+  sethome: { description: "Player" }
+  tpa: { description: "Player" }
+  tpaccept: { description: "Player" }
+  pvp: { description: "Player" }
+  spawn: { description: "Player" }
+  tamanho: { description: "Player" }
+  
