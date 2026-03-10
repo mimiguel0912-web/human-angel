@@ -1,7 +1,6 @@
 package com.humanangel;
 
 import org.bukkit.*;
-import org.bukkit.block.Block;
 import org.bukkit.command.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.*;
@@ -26,15 +25,14 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
 
     @Override
     public void onEnable() {
-        saveDefaultConfig();
         getServer().getPluginManager().registerEvents(this, this);
-        String[] adminCmds = {"mode", "control", "sc", "ha", "angelwand", "set", "paredes", "zoeira"};
-        String[] playerCmds = {"home", "sethome", "tpa", "tpaccept", "pvp", "spawn", "tamanho"};
+        String[] cmds = {"mode", "control", "sc", "ha", "angelwand", "set", "paredes", "zoeira", "home", "sethome", "tpa", "tpaccept", "pvp", "spawn", "tamanho"};
+        for (String s : cmds) {
+            PluginCommand pc = getCommand(s);
+            if (pc != null) pc.setExecutor(this);
+        }
         
-        for (String s : adminCmds) getCommand(s).setExecutor(this);
-        for (String s : playerCmds) getCommand(s).setExecutor(this);
-
-        // Sistema /zoeira: Avisos Automáticos a cada 2 horas (144000 ticks)
+        // Loop de Avisos /zoeira a cada 2 horas
         Bukkit.getScheduler().runTaskTimer(this, () -> {
             if (!zoeiraMessages.isEmpty()) {
                 String msg = zoeiraMessages.get(new Random().nextInt(zoeiraMessages.size()));
@@ -51,96 +49,58 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
         Player p = (Player) sender;
         String c = cmd.getName().toLowerCase();
 
-        // --- COMANDOS DE ADM (Somente OP) ---
+        // Bloqueio de ADM
         if (Arrays.asList("mode", "control", "sc", "ha", "angelwand", "set", "paredes", "zoeira").contains(c)) {
             if (!p.isOp()) { p.sendMessage("§cSem permissão!"); return true; }
         }
 
         switch (c) {
+            case "ha": p.sendMessage("§b§lHUMAN ANGEL §fv1.3 - Ativo!"); break;
             case "zoeira":
-                if (args.length == 0) p.sendMessage("§eUse: /zoeira [mensagem] para adicionar um aviso.");
-                else {
+                if (args.length > 0) {
                     zoeiraMessages.add(String.join(" ", args));
-                    p.sendMessage("§aAviso adicionado ao sistema de 2 horas!");
-                }
-                break;
-            case "set": // WorldEdit Integrado
-                if (args.length == 0) return false;
-                fillArea(p, Material.matchMaterial(args[0]), false);
-                break;
-            case "paredes":
-                if (args.length == 0) return false;
-                fillArea(p, Material.matchMaterial(args[0]), true);
-                break;
+                    p.sendMessage("§aAviso salvo para o sistema de 2h!");
+                } break;
+            case "set": fillArea(p, (args.length > 0 ? Material.matchMaterial(args[0]) : null), false); break;
+            case "paredes": fillArea(p, (args.length > 0 ? Material.matchMaterial(args[0]) : null), true); break;
             case "home": p.teleport(homes.getOrDefault(p.getUniqueId(), p.getWorld().getSpawnLocation())); break;
-            case "sethome": homes.put(p.getUniqueId(), p.getLocation()); p.sendMessage("§aHome definida!"); break;
+            case "sethome": homes.put(p.getUniqueId(), p.getLocation()); p.sendMessage("§aHome salva!"); break;
             case "tpa":
-                if (args.length == 0) return false;
-                Player target = Bukkit.getPlayer(args[0]);
-                if (target != null) {
-                    tpaRequests.put(target.getUniqueId(), p.getUniqueId());
-                    target.sendMessage("§e" + p.getName() + " quer ir até você. /tpaccept");
-                }
-                break;
+                if (args.length > 0) {
+                    Player t = Bukkit.getPlayer(args[0]);
+                    if (t != null) { tpaRequests.put(t.getUniqueId(), p.getUniqueId()); p.sendMessage("§ePedido enviado!"); }
+                } break;
             case "tpaccept":
-                UUID requesterId = tpaRequests.get(p.getUniqueId());
-                if (requesterId != null) {
-                    Bukkit.getPlayer(requesterId).teleport(p.getLocation());
-                    tpaRequests.remove(p.getUniqueId());
-                }
-                break;
-            case "control":
-                Inventory inv = Bukkit.createInventory(null, 54, "§0Controle");
-                for (Player online : Bukkit.getOnlinePlayers()) {
-                    ItemStack head = new ItemStack(Material.PLAYER_HEAD);
-                    ItemMeta m = head.getItemMeta(); m.setDisplayName("§e" + online.getName()); head.setItemMeta(m);
-                    inv.addItem(head);
-                }
-                p.openInventory(inv);
+                UUID req = tpaRequests.remove(p.getUniqueId());
+                if (req != null && Bukkit.getPlayer(req) != null) Bukkit.getPlayer(req).teleport(p.getLocation());
                 break;
             case "angelwand":
-                ItemStack tridente = new ItemStack(Material.TRIDENT);
-                ItemMeta tm = tridente.getItemMeta(); tm.setDisplayName("§b§lAngel Wand"); tridente.setItemMeta(tm);
-                p.getInventory().addItem(tridente);
-                break;
+                ItemStack t = new ItemStack(Material.TRIDENT);
+                ItemMeta m = t.getItemMeta(); m.setDisplayName("§b§lAngel Wand"); t.setItemMeta(m);
+                p.getInventory().addItem(t); break;
         }
         return true;
     }
 
-    // Lógica do WorldEdit (Set e Paredes)
-    private void fillArea(Player p, Material mat, boolean apenasParedes) {
+    private void fillArea(Player p, Material mat, boolean walls) {
         Location l1 = pos1.get(p.getUniqueId()), l2 = pos2.get(p.getUniqueId());
-        if (l1 == null || l2 == null || mat == null) return;
+        if (l1 == null || l2 == null || mat == null) { p.sendMessage("§cUse o tridente primeiro!"); return; }
         int minX = Math.min(l1.getBlockX(), l2.getBlockX()), maxX = Math.max(l1.getBlockX(), l2.getBlockX());
         int minY = Math.min(l1.getBlockY(), l2.getBlockY()), maxY = Math.max(l1.getBlockY(), l2.getBlockY());
         int minZ = Math.min(l1.getBlockZ(), l2.getBlockZ()), maxZ = Math.max(l1.getBlockZ(), l2.getBlockZ());
-
-        for (int x = minX; x <= maxX; x++) {
-            for (int y = minY; y <= maxY; y++) {
-                for (int z = minZ; z <= maxZ; z++) {
-                    if (apenasParedes && (x > minX && x < maxX && z > minZ && z < maxZ)) continue;
-                    p.getWorld().getBlockAt(x, y, z).setType(mat);
-                }
-            }
+        for (int x = minX; x <= maxX; x++) for (int y = minY; y <= maxY; y++) for (int z = minZ; z <= maxZ; z++) {
+            if (walls && (x > minX && x < maxX && z > minZ && z < maxZ)) continue;
+            p.getWorld().getBlockAt(x, y, z).setType(mat);
         }
-        p.sendMessage("§aOperação concluída!");
     }
 
     @EventHandler
     public void onInteract(PlayerInteractEvent e) {
-        if (e.getItem() != null && e.getItem().getType() == Material.TRIDENT && e.getItem().getItemMeta().getDisplayName().contains("Angel Wand")) {
+        if (e.getItem() != null && e.getItem().getType() == Material.TRIDENT && e.getItem().hasItemMeta() && e.getItem().getItemMeta().getDisplayName().contains("Angel Wand")) {
             e.setCancelled(true);
             if (e.getAction().name().contains("LEFT")) pos1.put(e.getPlayer().getUniqueId(), e.getPlayer().getLocation());
             else pos2.put(e.getPlayer().getUniqueId(), e.getPlayer().getLocation());
             e.getPlayer().sendMessage("§bPosição marcada!");
-        }
-    }
-
-    @EventHandler
-    public void onDamage(EntityDamageByEntityEvent e) {
-        if (e.getEntity() instanceof Player && e.getDamager() instanceof Player) {
-            if (!pvpEnabled) e.setCancelled(true);
-            else { inCombat.put(e.getEntity().getUniqueId(), System.currentTimeMillis()); inCombat.put(e.getDamager().getUniqueId(), System.currentTimeMillis()); }
         }
     }
 
