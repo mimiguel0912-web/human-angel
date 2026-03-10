@@ -1,19 +1,22 @@
 name: HumanAngel
-version: 1.4.1
+version: 1.4.0
 main: com.humanangel.Main
 api-version: 1.21
 commands:
   ha: { description: "Versao" }
-  modo: { description: "Troca o modo" }
+  modo: { description: "Modo" }
   sc: { description: "Chat Staff" }
-  home: { description: "Vai home" }
-  sethome: { description: "Salva home" }
-  spawn: { description: "Vai spawn" }
-  lista: { description: "Ver lista" }
-  set: { description: "WorldEdit" }
-  paredes: { description: "Cria paredes" }
+  home: { description: "Home" }
+  sethome: { description: "SetHome" }
+  spawn: { description: "Spawn" }
+  lista: { description: "Lista" }
+  set: { description: "Set" }
+  paredes: { description: "Paredes" }
   pos1: { description: "Pos 1" }
   pos2: { description: "Pos 2" }
-  angelwand: { description: "Pega Tridente" }
-  clearlag: { description: "Limpa o chao" }
+  angelwand: { description: "Machado" }
+  clearlag: { description: "Limpa" }
+  rg: { description: "WorldGuard" }
+  control: { description: "Controle" }
+  zoeira: { description: "Filtro de Chat" }
   
