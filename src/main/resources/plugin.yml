@@ -10,13 +10,18 @@ commands:
   sethome: { description: "SetHome" }
   spawn: { description: "Spawn" }
   lista: { description: "Lista" }
-  set: { description: "Set" }
+  set: { description: "Set blocos" }
   paredes: { description: "Paredes" }
   pos1: { description: "Pos 1" }
   pos2: { description: "Pos 2" }
   angelwand: { description: "Machado" }
   clearlag: { description: "Limpa" }
-  rg: { description: "WorldGuard" }
-  control: { description: "Controle" }
-  zoeira: { description: "Filtro de Chat" }
+  rg: { description: "RG" }
+  rglista: { description: "Lista RGs" }
+  control: { description: "Menu Admin" }
+  zoeira: { description: "Filtro" }
+  tpa: { description: "TPA" }
+  tpaccept: { description: "Aceitar TPA" }
+  tpadeny: { description: "Negar TPA" }
+  avisos: { description: "Avisos Automáticos" }
   
