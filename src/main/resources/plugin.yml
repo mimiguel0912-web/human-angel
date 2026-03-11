@@ -3,25 +3,22 @@ version: 1.4.0
 main: com.humanangel.Main
 api-version: 1.21
 commands:
-  ha: { description: "Versao" }
+  ha: { description: "Plugin" }
   modo: { description: "Modo" }
-  sc: { description: "Chat Staff" }
+  sc: { description: "Staff Chat" }
   home: { description: "Home" }
   sethome: { description: "SetHome" }
   spawn: { description: "Spawn" }
-  lista: { description: "Lista" }
-  set: { description: "Set blocos" }
+  set: { description: "Set" }
   paredes: { description: "Paredes" }
   pos1: { description: "Pos 1" }
   pos2: { description: "Pos 2" }
   angelwand: { description: "Machado" }
-  clearlag: { description: "Limpa" }
-  rg: { description: "RG" }
-  rglista: { description: "Lista RGs" }
-  control: { description: "Menu Admin" }
-  zoeira: { description: "Filtro" }
+  clearlag: { description: "Limpa itens" }
+  control: { description: "Menu" }
   tpa: { description: "TPA" }
-  tpaccept: { description: "Aceitar TPA" }
-  tpadeny: { description: "Negar TPA" }
-  avisos: { description: "Avisos Automáticos" }
+  tpaccept: { description: "Aceitar" }
+  zoeira: { description: "Filtro" }
+  avisos: { description: "Mensagens" }
+  rglista: { description: "RGs" }
   
