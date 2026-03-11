@@ -1,5 +1,5 @@
 name: HumanAngel
-version: 1.5.1
+version: 1.6
 main: com.humanangel.Main
 api-version: 1.21
 commands:
@@ -19,7 +19,3 @@ commands:
   control: { description: "Control" }
   zoeira: { description: "Zoeira" }
   avisos: { description: "Avisos" }
-  rg: { description: "RG" }
-  flag: { description: "Flag" }
-  rglista: { description: "RG Lista" }
-  
