@@ -1,21 +1,31 @@
 name: HumanAngel
-version: 1.6
+version: 1.6.0
 main: com.humanangel.Main
 api-version: 1.21
+depend: [WorldGuard] # Isso é importante porque você subiu o JAR do WorldGuard
 commands:
-  ha: { description: "V" }
-  lista: { description: "Lista" }
-  modo: { description: "Modo" }
-  sc: { description: "SC" }
-  home: { description: "Home" }
-  sethome: { description: "SetHome" }
-  spawn: { description: "Spawn" }
-  set: { description: "Set" }
-  paredes: { description: "Paredes" }
-  pos1: { description: "P1" }
-  pos2: { description: "P2" }
-  angelwand: { description: "Machado" }
-  clearlag: { description: "Lag" }
-  control: { description: "Control" }
-  zoeira: { description: "Zoeira" }
-  avisos: { description: "Avisos" }
+  ha:
+    description: Comando principal
+  modo:
+    description: Mudar gamemode
+  sc:
+    description: Chat da staff
+  home:
+    description: Ir para casa
+  sethome:
+    description: Definir casa
+  spawn:
+    description: Ir para o spawn
+  set:
+    description: Preencher área
+  paredes:
+    description: Criar paredes
+  angelwand:
+    description: Pegar o machado
+  control:
+    description: Menu de inventário
+  lista:
+    description: Ver comandos
+  clearlag:
+    description: Limpar o chão
+    
