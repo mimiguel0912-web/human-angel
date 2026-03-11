@@ -1,24 +1,25 @@
 name: HumanAngel
-version: 1.4.0
+version: 1.5.1
 main: com.humanangel.Main
 api-version: 1.21
 commands:
-  ha: { description: "Plugin" }
+  ha: { description: "V" }
+  lista: { description: "Lista" }
   modo: { description: "Modo" }
-  sc: { description: "Staff Chat" }
+  sc: { description: "SC" }
   home: { description: "Home" }
   sethome: { description: "SetHome" }
   spawn: { description: "Spawn" }
   set: { description: "Set" }
   paredes: { description: "Paredes" }
-  pos1: { description: "Pos 1" }
-  pos2: { description: "Pos 2" }
+  pos1: { description: "P1" }
+  pos2: { description: "P2" }
   angelwand: { description: "Machado" }
-  clearlag: { description: "Limpa itens" }
-  control: { description: "Menu" }
-  tpa: { description: "TPA" }
-  tpaccept: { description: "Aceitar" }
-  zoeira: { description: "Filtro" }
-  avisos: { description: "Mensagens" }
-  rglista: { description: "RGs" }
+  clearlag: { description: "Lag" }
+  control: { description: "Control" }
+  zoeira: { description: "Zoeira" }
+  avisos: { description: "Avisos" }
+  rg: { description: "RG" }
+  flag: { description: "Flag" }
+  rglista: { description: "RG Lista" }
   
