@@ -32,13 +32,11 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
             if (pc != null) pc.setExecutor(this);
         }
         
-        // ClearLag - 15 minutos
         new BukkitRunnable() {
             @Override
             public void run() { limparItens(); }
         }.runTaskTimer(this, 18000L, 18000L);
 
-        // Sistema de Avisos Automáticos - A cada 2 horas (144.000 ticks)
         new BukkitRunnable() {
             int index = 0;
             @Override
@@ -58,88 +56,54 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
         Player p = (Player) sender;
         String c = cmd.getName().toLowerCase();
 
-        // Verificação de permissão OP para comandos admin
-        if (Arrays.asList("modo", "sc", "set", "paredes", "angelwand", "clearlag", "rg", "control", "zoeira", "avisos").contains(c) && !p.isOp()) {
+        if (Arrays.asList("modo", "sc", "set", "paredes", "angelwand", "clearlag", "rg", "control", "zoeira", "avisos", "pos1", "pos2").contains(c) && !p.isOp()) {
             p.sendMessage("§cSem permissão!"); return true;
         }
 
         switch (c) {
-            case "ha": p.sendMessage("§b§lHUMAN ANGEL §fv1.4.0"); break;
-
-            case "avisos":
-                if (args.length == 0) { p.sendMessage("§e/avisos [add/remove/list] [mensagem]"); return true; }
-                if (args[0].equalsIgnoreCase("add")) {
-                    avisosServidor.add(String.join(" ", Arrays.copyOfRange(args, 1, args.length)));
-                    p.sendMessage("§aAviso adicionado!");
-                } else if (args[0].equalsIgnoreCase("remove")) {
-                    try { avisosServidor.remove(Integer.parseInt(args[1])); p.sendMessage("§cAviso removido!"); } catch(Exception e) { p.sendMessage("§cUse o ID da lista."); }
-                } else if (args[0].equalsIgnoreCase("list")) {
-                    p.sendMessage("§b§l--- LISTA DE AVISOS ---");
-                    for (int i=0; i<avisosServidor.size(); i++) p.sendMessage("§e" + i + ": §f" + avisosServidor.get(i));
-                }
+            case "sc":
+                if (args.length == 0) p.sendMessage("§eEscreva uma mensagem!");
+                else Bukkit.broadcast("§d§l[STAFF] §f" + p.getName() + ": §7" + String.join(" ", args), Server.BROADCAST_CHANNEL_ADMINISTRATIVE);
                 break;
-
-            case "rglista":
-                p.sendMessage("§b§l--- REGIÕES REGISTRADAS ---");
-                if (regions.isEmpty()) p.sendMessage("§7Nenhuma região criada.");
-                else for (String name : regions.keySet()) p.sendMessage("§f- " + name);
-                break;
-
-            case "tpa":
-                if (args.length == 0) { p.sendMessage("§eUse: /tpa [nick]"); return true; }
-                Player targetTpa = Bukkit.getPlayer(args[0]);
-                if (targetTpa == null) { p.sendMessage("§cOffline!"); return true; }
-                tpaRequests.put(targetTpa.getUniqueId(), p.getUniqueId());
-                p.sendMessage("§aPedido enviado para " + targetTpa.getName());
-                targetTpa.sendMessage("§e" + p.getName() + " quer ir até você. /tpaccept ou /tpadeny");
-                break;
-
-            case "tpaccept":
-                if (tpaRequests.containsKey(p.getUniqueId())) {
-                    Player requester = Bukkit.getPlayer(tpaRequests.get(p.getUniqueId()));
-                    if (requester != null) { requester.teleport(p.getLocation()); requester.sendMessage("§aTeleportado!"); }
-                    tpaRequests.remove(p.getUniqueId());
-                } else p.sendMessage("§cSem pedidos.");
-                break;
-
-            case "tpadeny":
-                tpaRequests.remove(p.getUniqueId()); p.sendMessage("§cRecusado."); break;
-
-            case "set":
-                fill(p, args, false); break;
-            case "paredes":
-                fill(p, args, true); break;
-
-            case "lista":
-                p.sendMessage("§b§l--- MEUS COMANDOS ---");
-                p.sendMessage("§f/home, /sethome, /spawn, /tpa, /tpaccept, /tpadeny, /lista");
-                if (p.isOp()) p.sendMessage("§eAdmin: /modo, /sc, /set, /paredes, /rg, /rglista, /control, /zoeira, /avisos");
-                break;
-
-            case "home":
-                if (homes.containsKey(p.getUniqueId())) p.teleport(homes.get(p.getUniqueId()));
-                else p.sendMessage("§c§lERRO: §fVocê não tem uma home salva! Use /sethome");
-                break;
-
-            case "sethome":
-                homes.put(p.getUniqueId(), p.getLocation()); p.sendMessage("§aHome salva com sucesso!"); break;
-
-            case "spawn": p.teleport(p.getWorld().getSpawnLocation()); p.sendMessage("§aIndo para o Spawn!"); break;
-
-            case "control": openControlMenu(p); break;
 
             case "modo":
                 if (args.length > 0) {
                     String m = args[0].toLowerCase();
                     if (m.equals("c")) p.setGameMode(GameMode.CREATIVE);
                     else if (m.equals("s")) p.setGameMode(GameMode.SURVIVAL);
-                    p.sendMessage("§aModo alterado!");
+                    else if (m.equals("a")) p.setGameMode(GameMode.ADVENTURE);
+                    else if (m.equals("sp")) p.setGameMode(GameMode.SPECTATOR);
+                    p.sendMessage("§aModo alterado para " + p.getGameMode().name());
                 } break;
 
-            case "angelwand":
-                p.getInventory().addItem(new ItemStack(Material.WOODEN_AXE));
-                p.sendMessage("§bMachado entregue!"); break;
+            case "pos1": pos1.put(p.getUniqueId(), p.getLocation()); p.sendMessage("§bPos 1 marcada no seu pé!"); break;
+            case "pos2": pos2.put(p.getUniqueId(), p.getLocation()); p.sendMessage("§dPos 2 marcada no seu pé!"); break;
+
+            case "set": fill(p, args, false); break;
+            case "paredes": fill(p, args, true); break;
             
+            case "home":
+                if (homes.containsKey(p.getUniqueId())) p.teleport(homes.get(p.getUniqueId()));
+                else p.sendMessage("§c§lERRO: §fVocê não tem uma home salva! Use /sethome");
+                break;
+            
+            case "sethome": homes.put(p.getUniqueId(), p.getLocation()); p.sendMessage("§aHome salva!"); break;
+            case "spawn": p.teleport(p.getWorld().getSpawnLocation()); break;
+            case "tpa":
+                if (args.length == 0) return true;
+                Player targetTpa = Bukkit.getPlayer(args[0]);
+                if (targetTpa != null) {
+                    tpaRequests.put(targetTpa.getUniqueId(), p.getUniqueId());
+                    targetTpa.sendMessage("§e" + p.getName() + " pediu TPA. /tpaccept");
+                } break;
+            case "tpaccept":
+                if (tpaRequests.containsKey(p.getUniqueId())) {
+                    Player r = Bukkit.getPlayer(tpaRequests.get(p.getUniqueId()));
+                    if (r != null) r.teleport(p.getLocation());
+                    tpaRequests.remove(p.getUniqueId());
+                } break;
+            case "control": openControlMenu(p); break;
+            case "angelwand": p.getInventory().addItem(new ItemStack(Material.WOODEN_AXE)); break;
             case "clearlag": limparItens(); break;
         }
         return true;
@@ -147,20 +111,19 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
 
     private void fill(Player p, String[] args, boolean walls) {
         Location l1 = pos1.get(p.getUniqueId()), l2 = pos2.get(p.getUniqueId());
-        if (l1 == null || l2 == null || args.length == 0) { p.sendMessage("§cMarque Pos 1 e Pos 2!"); return; }
+        if (l1 == null || l2 == null || args.length == 0) { p.sendMessage("§cMarque as posições!"); return; }
         Material mat = Material.matchMaterial(args[0].toUpperCase());
-        if (mat == null) { p.sendMessage("§cBloco inválido!"); return; }
+        if (mat == null) return;
         int minX = Math.min(l1.getBlockX(), l2.getBlockX()), maxX = Math.max(l1.getBlockX(), l2.getBlockX());
         int minY = Math.min(l1.getBlockY(), l2.getBlockY()), maxY = Math.max(l1.getBlockY(), l2.getBlockY());
         int minZ = Math.min(l1.getBlockZ(), l2.getBlockZ()), maxZ = Math.max(l1.getBlockZ(), l2.getBlockZ());
         for (int x = minX; x <= maxX; x++) for (int y = minY; y <= maxY; y++) for (int z = minZ; z <= maxZ; z++) {
-            if (walls && (x > minX && x < maxX && z > minZ && z < maxZ)) continue;
+            if (walls && (x > minX && x < maxX && z > minZ && z < maxZ && y > minY && y < maxY)) continue;
             p.getWorld().getBlockAt(x, y, z).setType(mat);
         }
-        p.sendMessage("§aBlocos alterados!");
+        p.sendMessage("§aPronto!");
     }
 
-    // --- GUI CONTROL ---
     private void openControlMenu(Player p) {
         Inventory inv = Bukkit.createInventory(null, 54, "§0Controle de Jogadores");
         for (Player online : Bukkit.getOnlinePlayers()) {
@@ -188,9 +151,9 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
         Player p = e.getPlayer();
         if (p.getInventory().getItemInMainHand().getType() == Material.WOODEN_AXE && p.isOp()) {
             if (e.getAction() == Action.LEFT_CLICK_BLOCK) {
-                e.setCancelled(true); pos1.put(p.getUniqueId(), e.getClickedBlock().getLocation()); p.sendMessage("§bPos 1 marcada!");
+                e.setCancelled(true); pos1.put(p.getUniqueId(), e.getClickedBlock().getLocation()); p.sendMessage("§bPos 1!");
             } else if (e.getAction() == Action.RIGHT_CLICK_BLOCK) {
-                e.setCancelled(true); pos2.put(p.getUniqueId(), e.getClickedBlock().getLocation()); p.sendMessage("§dPos 2 marcada!");
+                e.setCancelled(true); pos2.put(p.getUniqueId(), e.getClickedBlock().getLocation()); p.sendMessage("§dPos 2!");
             }
         }
     }
@@ -198,7 +161,7 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
     private void limparItens() {
         int i = 0;
         for (World w : Bukkit.getWorlds()) for (Entity en : w.getEntities()) if (en instanceof Item) { en.remove(); i++; }
-        Bukkit.broadcastMessage("§e§l[ClearLag] §fForam limpos §6" + i + " §fitens.");
+        Bukkit.broadcastMessage("§e§l[ClearLag] §fLimpamos §6" + i + " §fitens.");
     }
 
     class Region {
