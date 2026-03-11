@@ -2,7 +2,7 @@ name: HumanAngel
 version: 1.6.0
 main: com.humanangel.Main
 api-version: 1.21
-depend: [WorldGuard] # Isso é importante porque você subiu o JAR do WorldGuard
+depend: [WorldGuard]
 commands:
   ha:
     description: Comando principal
