@@ -2,52 +2,28 @@ name: HumanAngel
 version: 1.6
 main: com.humanangel.Main
 api-version: 1.21
-authors: [HumanAngel]
-description: Plugin completo com TPA, Homes, Zueira, Avisos, Controle e Diversos comandos.
-
 commands:
-  ha:
-    description: Ver status do plugin.
-  modo:
-    description: Alternar gamemodes (c, s, a, sp).
-  home:
-    description: Teleportar para sua home.
-  sethome:
-    description: Salvar sua home atual.
-  spawn:
-    description: Ir para o spawn.
-  control:
-    description: Abrir o menu de controle de jogadores (Cabeças).
-  lista:
-    description: Mostrar a lista de comandos.
-  clearlag:
-    description: Limpar itens do chão.
-  tpa:
-    description: Pedir teleporte a um jogador.
-  tpaccept:
-    description: Aceitar teleporte.
-  zueira:
-    description: Gerenciar o filtro de palavras.
-  avisos:
-    description: Gerenciar avisos automáticos.
-  luz:
-    description: Ativar/Desativar visão noturna.
-  corrigir:
-    description: Reparar o item da mão (Admins).
-  mudarip:
-    description: Verificar o IP de um jogador (Admins).
-  chapeu:
-    description: Colocar um bloco na cabeça.
-  lixeira:
-    description: Abrir o menu de descarte de itens.
-  perfil:
-    description: Ver suas informações básicas.
-  anuncio:
-    description: Enviar um anúncio no meio da tela (Admins).
-  congelar:
-    description: Congelar ou descongelar um jogador (Admins).
-  morte:
-    description: Comando para suicídio rápido.
-  compactar:
-    description: Transformar minérios em blocos automaticamente.
-    
+  ha: {description: Status}
+  modo: {description: Gamemodes}
+  home: {description: Ir home}
+  sethome: {description: Setar home}
+  spawn: {description: Spawn}
+  control: {description: Menu de cabeças}
+  lista: {description: Lista de comandos}
+  clearlag: {description: Limpar chao}
+  tpa: {description: Pedir TPA}
+  tpaccept: {description: Aceitar}
+  tpdeny: {description: Negar}
+  zueira: {description: Filtro chat}
+  avisos: {description: Mensagens auto}
+  luz: {description: Visao Noturna}
+  corrigir: {description: Reparar item}
+  mudarip: {description: Ver IP}
+  chapeu: {description: Bloco na cabeca}
+  lixeira: {description: Lixeira}
+  perfil: {description: Perfil}
+  anuncio: {description: Title}
+  congelar: {description: Congelar}
+  morte: {description: kill}
+  compactar: {description: Minerios}
+  
