@@ -97,11 +97,38 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
             case "tpaccept": acceptTPA(p); break;
             case "tpdeny": tpaRequests.entrySet().removeIf(e -> e.getValue().equals(p.getUniqueId())); break;
             
-            case "anuncio": // GLOBAL com espaços
-                if(args.length == 0) break;
-                String msgG = String.join(" ", args).replace("&", "§");
-                for(Player a : Bukkit.getOnlinePlayers()) a.sendTitle("§6§lAVISO", msgG, 10, 70, 20);
-                break;
+            case "anuncio":
+    if (args.length == 0) break;
+    String texto = String.join(" ", args);
+
+    // Lógica para o @p funcionar
+    if (texto.contains("@p")) {
+        Player maisProximo = null;
+        double distanciaCurta = Double.MAX_VALUE;
+        
+        for (Player online : Bukkit.getOnlinePlayers()) {
+            if (online.equals(p)) continue; // ignora você mesmo
+            if (online.getWorld().equals(p.getWorld())) {
+                double dist = online.getLocation().distance(p.getLocation());
+                if (dist < distanciaCurta) {
+                    distanciaCurta = dist;
+                    maisProximo = online;
+                }
+            }
+        }
+        
+        if (maisProximo != null) {
+            texto = texto.replace("@p", maisProximo.getName());
+        } else {
+            texto = texto.replace("@p", "ninguém");
+        }
+    }
+
+    String msgFinal = texto.replace("&", "§");
+    for (Player a : Bukkit.getOnlinePlayers()) {
+        a.sendTitle("§6§lAVISO", msgFinal, 10, 70, 20);
+    }
+    break;
 
             case "aviso": // PRIVADO com espaços
                 if(args.length < 2) break;
