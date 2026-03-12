@@ -2,37 +2,52 @@ name: HumanAngel
 version: 1.6
 main: com.humanangel.Main
 api-version: 1.21
+authors: [HumanAngel]
+description: Plugin completo com TPA, Homes, Zueira, Avisos, Controle e Diversos comandos.
+
 commands:
   ha:
-    description: Status
+    description: Ver status do plugin.
   modo:
-    description: Alternar gamemodes (c, s, a, sp)
+    description: Alternar gamemodes (c, s, a, sp).
   home:
-    description: Ir home
+    description: Teleportar para sua home.
   sethome:
-    description: Setar home
+    description: Salvar sua home atual.
   spawn:
-    description: Spawn
-  set:
-    description: Fill
-  paredes:
-    description: Walls
-  angelwand:
-    description: Wand
+    description: Ir para o spawn.
   control:
-    description: Ver inventarios
+    description: Abrir o menu de controle de jogadores (Cabeças).
   lista:
-    description: Ver comandos
+    description: Mostrar a lista de comandos.
   clearlag:
-    description: Limpar chao
+    description: Limpar itens do chão.
   tpa:
-    description: Pedir teleporte
+    description: Pedir teleporte a um jogador.
   tpaccept:
-    description: Aceitar teleporte
-  tpdeny:
-    description: Recusar teleporte
+    description: Aceitar teleporte.
   zueira:
-    description: Filtro de palavras
+    description: Gerenciar o filtro de palavras.
   avisos:
-    description: Mensagens automaticas
+    description: Gerenciar avisos automáticos.
+  luz:
+    description: Ativar/Desativar visão noturna.
+  corrigir:
+    description: Reparar o item da mão (Admins).
+  mudarip:
+    description: Verificar o IP de um jogador (Admins).
+  chapeu:
+    description: Colocar um bloco na cabeça.
+  lixeira:
+    description: Abrir o menu de descarte de itens.
+  perfil:
+    description: Ver suas informações básicas.
+  anuncio:
+    description: Enviar um anúncio no meio da tela (Admins).
+  congelar:
+    description: Congelar ou descongelar um jogador (Admins).
+  morte:
+    description: Comando para suicídio rápido.
+  compactar:
+    description: Transformar minérios em blocos automaticamente.
     
