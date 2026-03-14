@@ -30,14 +30,18 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
         loadData();
         getServer().getPluginManager().registerEvents(this, this);
 
-        // Registro de todos os comandos
+        // REGISTRO OBRIGATÓRIO DE TODOS OS COMANDOS
         String[] cmds = {"ha","modo","home","sethome","spawn","control","lista","clearlag","tpa","tpaccept","zueira","avisos","luz","corrigir","chapeu","lixeira","perfil","anuncio","morte","compactar","sc"};
         for (String s : cmds) {
             PluginCommand pc = getCommand(s);
-            if (pc != null) pc.setExecutor(this);
+            if (pc != null) {
+                pc.setExecutor(this);
+            } else {
+                getLogger().warning("Comando nao encontrado no plugin.yml: " + s);
+            }
         }
 
-        // Avisos automáticos a cada 30 minutos
+        // Sistema de Avisos (30 minutos)
         Bukkit.getScheduler().runTaskTimer(this, () -> {
             if (!listaAvisos.isEmpty()) {
                 String aviso = listaAvisos.get(new Random().nextInt(listaAvisos.size())).replace("&", "§");
@@ -52,69 +56,64 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
         Player p = (Player) sender;
         String n = cmd.getName().toLowerCase();
 
-        // Verificação de permissão Admin
+        // Verificação de Admin
         List<String> adminCmds = Arrays.asList("modo", "control", "clearlag", "anuncio", "sc", "avisos", "zueira", "corrigir");
         if (adminCmds.contains(n) && !p.isOp()) {
-            p.sendMessage("§cVocê não tem permissão para usar este comando!");
+            p.sendMessage("§cERRO: Apenas STAFF pode usar este comando.");
             return true;
         }
 
         switch (n) {
             case "modo":
                 if (args.length == 0) { p.sendMessage("§eUse: /modo [c, s, a, sp]"); break; }
-                if (args[0].equalsIgnoreCase("c")) p.setGameMode(GameMode.CREATIVE);
-                else if (args[0].equalsIgnoreCase("s")) p.setGameMode(GameMode.SURVIVAL);
-                else if (args[0].equalsIgnoreCase("a")) p.setGameMode(GameMode.ADVENTURE);
-                else if (args[0].equalsIgnoreCase("sp")) p.setGameMode(GameMode.SPECTATOR);
-                p.sendMessage("§aModo de jogo alterado!");
+                String m = args[0].toLowerCase();
+                if (m.equals("c")) p.setGameMode(GameMode.CREATIVE);
+                else if (m.equals("s")) p.setGameMode(GameMode.SURVIVAL);
+                else if (m.equals("a")) p.setGameMode(GameMode.ADVENTURE);
+                else if (m.equals("sp")) p.setGameMode(GameMode.SPECTATOR);
+                p.sendMessage("§aModo alterado!");
                 break;
 
             case "perfil":
                 p.sendMessage("§b§l--- SEU PERFIL ---");
-                p.sendMessage("§fNome: §7" + p.getName());
-                p.sendMessage("§fVida: §c" + (int)p.getHealth() + "/20 HP");
-                p.sendMessage("§fFome: §6" + p.getFoodLevel() + "/20");
-                p.sendMessage("§fNível XP: §a" + p.getLevel());
-                p.sendMessage("§fPing: §e" + p.getPing() + "ms");
-                p.sendMessage("§fMundo: §7" + p.getWorld().getName());
-                p.sendMessage("§b§l-----------------");
+                p.sendMessage("§fNome: §b" + p.getName());
+                p.sendMessage("§fVida: §c" + (int)p.getHealth() + " HP");
+                p.sendMessage("§fFome: §6" + p.getFoodLevel());
+                p.sendMessage("§fXP: §aNivel " + p.getLevel());
+                p.sendMessage("§fMundo: §e" + p.getWorld().getName());
+                p.sendMessage("§fPing: §f" + p.getPing() + "ms");
                 break;
 
             case "lista":
                 p.sendMessage("§b§l--- COMANDOS DISPONÍVEIS ---");
-                p.sendMessage("§f• /home, /sethome, /spawn");
-                p.sendMessage("§f• /tpa, /tpaccept, /perfil");
-                p.sendMessage("§f• /luz, /chapeu, /lixeira");
-                p.sendMessage("§f• /compactar, /morte");
-                if (p.isOp()) {
-                    p.sendMessage("§e§lADMIN: §f/modo, /control, /anuncio, /sc, /avisos, /zueira, /clearlag");
-                }
+                p.sendMessage("§fJogadores: §7/home, /sethome, /spawn, /tpa, /tpaccept, /perfil, /luz, /chapeu, /lixeira, /compactar, /morte");
+                if (p.isOp()) p.sendMessage("§dStaff: §7/modo, /control, /anuncio, /sc, /avisos, /zueira, /clearlag");
+                break;
+
+            case "chapeu":
+                ItemStack hand = p.getInventory().getItemInMainHand();
+                if (hand.getType() == Material.AIR) { p.sendMessage("§cSegure algo!"); break; }
+                ItemStack helm = p.getInventory().getHelmet();
+                p.getInventory().setHelmet(hand);
+                p.getInventory().setItemInMainHand(helm);
+                p.updateInventory(); // Crucial para Bedrock
+                p.sendMessage("§aChapéu colocado!");
                 break;
 
             case "control":
                 openControlMenu(p);
                 break;
 
-            case "chapeu":
-                ItemStack hand = p.getInventory().getItemInMainHand();
-                if (hand.getType() == Material.AIR) { p.sendMessage("§cSegure algo na mão!"); break; }
-                ItemStack helm = p.getInventory().getHelmet();
-                p.getInventory().setHelmet(hand);
-                p.getInventory().setItemInMainHand(helm);
-                p.updateInventory(); // Sincroniza Java e Bedrock
-                p.sendMessage("§eChapéu equipado com sucesso!");
-                break;
-
             case "sc":
                 if (args.length == 0) break;
-                String msgSc = String.join(" ", args).replace("&", "§");
-                Bukkit.getOnlinePlayers().stream().filter(Player::isOp).forEach(s -> s.sendMessage("§d[STAFF] §f" + p.getName() + ": " + msgSc));
+                String msg = "§d[STAFF] §f" + p.getName() + ": " + String.join(" ", args).replace("&", "§");
+                Bukkit.getOnlinePlayers().stream().filter(Player::isOp).forEach(s -> s.sendMessage(msg));
                 break;
 
             case "anuncio":
                 if (args.length == 0) break;
                 String txt = String.join(" ", args).replace("&", "§");
-                Bukkit.getOnlinePlayers().forEach(a -> a.sendTitle("§6§lANUNCIO", txt, 10, 70, 20));
+                Bukkit.getOnlinePlayers().forEach(all -> all.sendTitle("§6§lAVISO", txt, 10, 70, 20));
                 break;
 
             case "sethome": homes.put(p.getUniqueId(), p.getLocation()); saveData(); p.sendMessage("§aHome salva!"); break;
@@ -154,7 +153,7 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
     private void clearLag() {
         int c = 0;
         for(World w : Bukkit.getWorlds()) for(Entity en : w.getEntities()) if(en instanceof Item) { en.remove(); c++; }
-        Bukkit.broadcastMessage("§e§l[Limpeza] §6" + c + " §fitens removidos do chão.");
+        Bukkit.broadcastMessage("§e§l[Limpeza] §6" + c + " §fitens removidos.");
     }
 
     private void compactar(Player p) {
@@ -165,8 +164,8 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
         if (d >= 9) {
             p.getInventory().addItem(new ItemStack(Material.DIAMOND_BLOCK, d / 9));
             if (d % 9 > 0) p.getInventory().addItem(new ItemStack(Material.DIAMOND, d % 9));
-            p.sendMessage("§aDiamantes compactados!");
-        } else p.sendMessage("§cVocê precisa de pelo menos 9 diamantes.");
+            p.sendMessage("§aCompactado!");
+        } else p.sendMessage("§cPrecisa de 9 diamantes.");
     }
 
     private void setupStorage() {
