@@ -1,29 +1,56 @@
 name: HumanAngel
-version: 1.6
+version: 1.7
 main: com.humanangel.Main
 api-version: 1.21
+authors: [HumanAngel]
+description: Plugin v1.7 com Chapéu Bedrock, Avisos 30min e Chat Staff.
+
 commands:
-  ha: {description: Status}
-  modo: {description: Gamemodes}
-  home: {description: Ir home}
-  sethome: {description: Setar home}
-  spawn: {description: Spawn}
-  control: {description: Menu de cabeças}
-  lista: {description: Lista de comandos}
-  clearlag: {description: Limpar chao}
-  tpa: {description: Pedir TPA}
-  tpaccept: {description: Aceitar}
-  tpdeny: {description: Negar}
-  zueira: {description: Filtro chat}
-  avisos: {description: Mensagens auto}
-  luz: {description: Visao Noturna}
-  corrigir: {description: Reparar item}
-  mudarip: {description: Ver IP}
-  chapeu: {description: Bloco na cabeca}
-  lixeira: {description: Lixeira}
-  perfil: {description: Perfil}
-  anuncio: {description: Title}
-  congelar: {description: Congelar}
-  morte: {description: kill}
-  compactar: {description: Minerios}
-  
+  ha:
+    description: Status do plugin.
+  modo:
+    description: Trocar gamemode (c, s, a, sp).
+  home:
+    description: Ir para sua home.
+  sethome:
+    description: Marcar sua home.
+  spawn:
+    description: Ir para o spawn.
+  control:
+    description: Menu de cabeças para vigiar inventários.
+  lista:
+    description: Lista de comandos.
+  clearlag:
+    description: Limpar itens do chão.
+  tpa:
+    description: Pedir teleporte.
+  tpaccept:
+    description: Aceitar teleporte.
+  tpdeny:
+    description: Negar teleporte.
+  zueira:
+    description: Configurar filtro de chat.
+  avisos:
+    description: Gerenciar avisos automáticos de 30 min (Action Bar).
+  luz:
+    description: Visão noturna.
+  corrigir:
+    description: Reparar item da mão.
+  mudarip:
+    description: Ver IP de um jogador.
+  chapeu:
+    description: Colocar bloco na cabeça (Compatível com Bedrock).
+  lixeira:
+    description: Abrir lixeira.
+  perfil:
+    description: Ver seu perfil.
+  anuncio:
+    description: Título global na tela (aceita @p e espaços).
+  congelar:
+    description: Prender jogador.
+  morte:
+    description: morte rápida.
+  compactar:
+    description: Transformar diamantes em blocos.
+  sc:
+    description: Chat exclusivo para a Staff (OPs).
