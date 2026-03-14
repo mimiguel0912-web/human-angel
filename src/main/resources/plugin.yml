@@ -6,51 +6,24 @@ authors: [HumanAngel]
 description: Plugin v1.7 com Chapéu Bedrock, Avisos 30min e Chat Staff.
 
 commands:
-  ha:
-    description: Status do plugin.
-  modo:
-    description: Trocar gamemode (c, s, a, sp).
-  home:
-    description: Ir para sua home.
-  sethome:
-    description: Marcar sua home.
-  spawn:
-    description: Ir para o spawn.
-  control:
-    description: Menu de cabeças para vigiar inventários.
-  lista:
-    description: Lista de comandos.
-  clearlag:
-    description: Limpar itens do chão.
-  tpa:
-    description: Pedir teleporte.
-  tpaccept:
-    description: Aceitar teleporte.
-  tpdeny:
-    description: Negar teleporte.
-  zueira:
-    description: Configurar filtro de chat.
-  avisos:
-    description: Gerenciar avisos automáticos de 30 min (Action Bar).
-  luz:
-    description: Visão noturna.
-  corrigir:
-    description: Reparar item da mão.
-  mudarip:
-    description: Ver IP de um jogador.
-  chapeu:
-    description: Colocar bloco na cabeça (Compatível com Bedrock).
-  lixeira:
-    description: Abrir lixeira.
-  perfil:
-    description: Ver seu perfil.
-  anuncio:
-    description: Título global na tela (aceita @p e espaços).
-  congelar:
-    description: Prender jogador.
-  morte:
-    description: morte rápida.
-  compactar:
-    description: Transformar diamantes em blocos.
-  sc:
-    description: Chat exclusivo para a Staff (OPs).
+  ha: {description: "Info"}
+  modo: {description: "Gamemode"}
+  home: {description: "Home"}
+  sethome: {description: "Setar"}
+  spawn: {description: "Spawn"}
+  control: {description: "Staff Menu"}
+  lista: {description: "Comandos"}
+  clearlag: {description: "Limpar"}
+  tpa: {description: "TPA"}
+  tpaccept: {description: "Aceitar"}
+  zueira: {description: "Filtro"}
+  avisos: {description: "Auto-Avisos"}
+  luz: {description: "NightVision"}
+  corrigir: {description: "Reparar"}
+  chapeu: {description: "Bedrock Hat"}
+  lixeira: {description: "Lixeira"}
+  perfil: {description: "Perfil Completo"}
+  anuncio: {description: "Titulo"}
+  morte: {description: "Suicidio"}
+  compactar: {description: "Compactar"}
+  sc: {description: "Chat Staff"}
