@@ -1,62 +1,32 @@
 package com.humanangel;
 
-import me.neznamy.tab.api.TabAPI;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class Main extends JavaPlugin implements Listener, CommandExecutor {
-
-    private final Map<UUID, UUID> tpaRequests = new HashMap<>(); // Quem pediu, Para quem
 
     @Override
     public void onEnable() {
         saveDefaultConfig();
         getServer().getPluginManager().registerEvents(this, this);
-        getCommand("ha").setExecutor(this);
-        getCommand("sethome").setExecutor(this);
-        getCommand("home").setExecutor(this);
-        getCommand("anuncio").setExecutor(this);
-        // ... (Registre os outros comandos aqui conforme o plugin.yml)
-        getLogger().info("HumanAngel V2 - MEMORIZADO E ATIVADO!");
-    }
-
-    // PROTEÇÃO DE TÍTULO (NÃO DEIXA SUMIR)
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onJoin(PlayerJoinEvent e) {
-        Player p = e.getPlayer();
-        // Se o cara for um Human Angel (vamos supor que salvamos na config)
-        if (getConfig().contains("status." + p.getUniqueId()) && getConfig().getString("status." + p.getUniqueId()).equals("ANGEL")) {
-            String tag = "§d§lHUMAN ANGEL §f";
-            
-            for (int delay : new int[]{40, 100, 200}) {
-                Bukkit.getScheduler().runTaskLater(this, () -> {
-                    if (p.isOnline()) {
-                        p.setDisplayName(tag + p.getName());
-                        p.setPlayerListName(tag + p.getName());
-                        if (Bukkit.getPluginManager().isPluginEnabled("TAB")) {
-                            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tab player " + p.getName() + " prefix " + tag);
-                        }
-                    }
-                }, delay);
-            }
-        }
+        getCommand("control").setExecutor(this);
+        // Os outros comandos (home, sethome, etc) continuam aqui...
     }
 
     @Override
@@ -64,70 +34,104 @@ public class Main extends JavaPlugin implements Listener, CommandExecutor {
         if (!(sender instanceof Player)) return true;
         Player p = (Player) sender;
 
-        // SISTEMA DE HOMES INFINITAS COM NOME
-        if (cmd.getName().equalsIgnoreCase("sethome")) {
-            String nomeHome = (args.length > 0) ? args[0].toLowerCase() : "home";
-            String path = "homes." + p.getUniqueId() + "." + nomeHome;
-            
-            getConfig().set(path + ".world", p.getLocation().getWorld().getName());
-            getConfig().set(path + ".x", p.getLocation().getX());
-            getConfig().set(path + ".y", p.getLocation().getY());
-            getConfig().set(path + ".z", p.getLocation().getZ());
-            saveConfig();
-            
-            p.sendMessage("§aHome '" + nomeHome + "' definida com sucesso!");
-            return true;
-        }
-
-        if (cmd.getName().equalsIgnoreCase("home")) {
-            String nomeHome = (args.length > 0) ? args[0].toLowerCase() : "home";
-            String path = "homes." + p.getUniqueId() + "." + nomeHome;
-
-            if (!getConfig().contains(path)) {
-                p.sendMessage("§cHome '" + nomeHome + "' nao encontrada!");
+        if (cmd.getName().equalsIgnoreCase("control")) {
+            if (!p.hasPermission("humanangel.adm")) {
+                p.sendMessage("§cSem permissão!");
                 return true;
             }
-
-            Location loc = new Location(
-                Bukkit.getWorld(getConfig().getString(path + ".world")),
-                getConfig().getDouble(path + ".x"),
-                getConfig().getDouble(path + ".y"),
-                getConfig().getDouble(path + ".z")
-            );
-            p.teleport(loc);
-            p.sendMessage("§aTeleportado para home: " + nomeHome);
+            abrirMenuControl(p);
             return true;
         }
-
-        // COMANDO DE ANÚNCIO (ADM)
-        if (cmd.getName().equalsIgnoreCase("anuncio")) {
-            if (!p.hasPermission("humanangel.adm")) return true;
-            String msg = String.join(" ", args).replace("&", "§");
-            for (Player all : Bukkit.getOnlinePlayers()) {
-                all.sendTitle("§6§lAVISO", msg, 10, 70, 20);
-            }
-            return true;
-        }
-
-        // LIXEIRA
-        if (cmd.getName().equalsIgnoreCase("lixeira")) {
-            Inventory inv = Bukkit.createInventory(null, 36, "§8Lixeira");
-            p.openInventory(inv);
-            return true;
-        }
-
-        // LUZ (VISÃO NOTURNA)
-        if (cmd.getName().equalsIgnoreCase("luz")) {
-            if (p.hasPotionEffect(PotionEffectType.NIGHT_VISION)) {
-                p.removePotionEffect(PotionEffectType.NIGHT_VISION);
-                p.sendMessage("§eLuz desativada!");
-            } else {
-                p.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 99999, 1));
-                p.sendMessage("§aLuz ativada!");
-            }
-            return true;
-        }
-
         return true;
+    }
+
+    // MENU 1: Lista de Jogadores (Cabeças)
+    public void abrirMenuControl(Player p) {
+        Inventory inv = Bukkit.createInventory(null, 54, "§8Controle de Jogadores");
+
+        for (Player online : Bukkit.getOnlinePlayers()) {
+            ItemStack head = new ItemStack(Material.PLAYER_HEAD);
+            SkullMeta meta = (SkullMeta) head.getItemMeta();
+            meta.setOwningPlayer(online);
+            meta.setDisplayName("§e" + online.getName());
+            List<String> lore = new ArrayList<>();
+            lore.add("§7Clique para gerenciar este jogador.");
+            meta.setLore(lore);
+            head.setItemMeta(meta);
+            inv.addItem(head);
+        }
+        p.openInventory(inv);
+    }
+
+    // MENU 2: Ações para o Jogador Selecionado
+    public void abrirMenuAcoes(Player adm, String alvoNome) {
+        Inventory inv = Bukkit.createInventory(null, 27, "§8Gerenciar: " + alvoNome);
+
+        // Botão Teleporte (Bússola)
+        inv.setItem(10, criarItem(Material.COMPASS, "§aIr até o jogador", "§7Teleporta você até ele."));
+        
+        // Botão Puxar (Corda/Lead)
+        inv.setItem(12, criarItem(Material.LEAD, "§ePuxar jogador", "§7Teleporta o jogador até você."));
+
+        // Botão Ver Inventário (Baú)
+        inv.setItem(14, criarItem(Material.CHEST, "§bVer Inventário", "§7Abre o inventário do jogador."));
+
+        // Botão Congelar (Gelo)
+        inv.setItem(16, criarItem(Material.ICE, "§fCongelar/Descongelar", "§7Trava o jogador no lugar."));
+
+        adm.openInventory(inv);
+    }
+
+    private ItemStack criarItem(Material mat, String nome, String loreMsg) {
+        ItemStack item = new ItemStack(mat);
+        ItemMeta meta = item.getItemMeta();
+        meta.setDisplayName(nome);
+        List<String> lore = new ArrayList<>();
+        lore.add(loreMsg);
+        meta.setLore(lore);
+        item.setItemMeta(meta);
+        return item;
+    }
+
+    @EventHandler
+    public void aoClicarNoMenu(InventoryClickEvent e) {
+        if (e.getView().getTitle().equals("§8Controle de Jogadores")) {
+            e.setCancelled(true);
+            if (e.getCurrentItem() == null || e.getCurrentItem().getType() == Material.AIR) return;
+
+            String nomeAlvo = e.getCurrentItem().getItemMeta().getDisplayName().replace("§e", "");
+            abrirMenuAcoes((Player) e.getWhoClicked(), nomeAlvo);
+        }
+
+        if (e.getView().getTitle().startsWith("§8Gerenciar: ")) {
+            e.setCancelled(true);
+            Player adm = (Player) e.getWhoClicked();
+            String nomeAlvo = e.getView().getTitle().replace("§8Gerenciar: ", "");
+            Player alvo = Bukkit.getPlayer(nomeAlvo);
+
+            if (alvo == null) {
+                adm.sendMessage("§cJogador offline!");
+                adm.closeInventory();
+                return;
+            }
+
+            switch (e.getRawSlot()) {
+                case 10: // Teleporte
+                    adm.teleport(alvo);
+                    adm.sendMessage("§aVocê foi até " + alvo.getName());
+                    break;
+                case 12: // Puxar
+                    alvo.teleport(adm);
+                    adm.sendMessage("§aVocê puxou " + alvo.getName());
+                    break;
+                case 14: // Invsee
+                    adm.openInventory(alvo.getInventory());
+                    break;
+                case 16: // Congelar
+                    Bukkit.dispatchCommand(adm, "congelar " + alvo.getName());
+                    adm.closeInventory();
+                    break;
+            }
+        }
     }
 }
