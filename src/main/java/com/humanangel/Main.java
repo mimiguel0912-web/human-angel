@@ -1,4 +1,3 @@
-
 package com.humanangel;
 
 import org.bukkit.*;
@@ -8,45 +7,27 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.*;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.*;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.potion.*;
 import java.io.*;
 import java.util.*;
 
 public class Main extends JavaPlugin implements Listener, CommandExecutor {
 
-    private Map<UUID, Location> homes = new HashMap<>();
-    private Map<UUID, UUID> tpaRequests = new HashMap<>();
-    private List<String> filtroZueira = new ArrayList<>();
-    private List<String> listaAvisos = new ArrayList<>();
-    private Set<UUID> congelados = new HashSet<>();
     private File dataFile;
     private FileConfiguration dataConfig;
-    private boolean zueiraAtiva = false;
 
     @Override
     public void onEnable() {
         setupStorage();
-        loadData();
         getServer().getPluginManager().registerEvents(this, this);
         
-        // Registrar todos os comandos que aparecem no seu arquivo
-        String[] cmds = {"ha", "modo", "home", "sethome", "spawn", "control", "lista", "clearlag", "tpa", "tpaccept", "tpdeny", "zueira", "avisos", "luz", "corrigir", "chapeu", "lixeira", "perfil", "anuncio", "aviso", "congelar", "morte", "compactar"};
-        for (String s : cmds) {
-            getCommand(s).setExecutor(this);
+        // Comandos que aparecem no seu log de Bytecode
+        String[] comandos = {"home", "sethome", "spawn", "control", "lista", "zueira", "luz", "morte", "compactar"};
+        for (String cmd : comandos) {
+            getCommand(cmd).setExecutor(this);
         }
-
-        // Sistema de Avisos Automáticos
-        Bukkit.getScheduler().runTaskTimer(this, () -> {
-            if (!listaAvisos.isEmpty()) {
-                String msg = listaAvisos.get(new Random().nextInt(listaAvisos.size()));
-                Bukkit.broadcastMessage("§6§l[SISTEMA] §f" + msg.replace("&", "§"));
-            }
-        }, 0L, 36000L);
     }
 
     @Override
@@ -58,24 +39,45 @@ public class Main extends JavaPlugin implements Listener, CommandExecutor {
         // --- HOMES INFINITAS ---
         if (c.equals("sethome")) {
             String nome = (args.length > 0) ? args[0].toLowerCase() : "home";
-            homes.put(p.getUniqueId(), p.getLocation()); // Simplificado para o mapa
-            p.sendMessage("§aHome '" + nome + "' salva!");
+            dataConfig.set("homes." + p.getUniqueId() + "." + nome, p.getLocation());
             saveData();
+            p.sendMessage("§a[!] Home '§e" + nome + "§a' salva no dados.yml!");
             return true;
         }
 
         if (c.equals("home")) {
             String nome = (args.length > 0) ? args[0].toLowerCase() : "home";
-            if (homes.containsKey(p.getUniqueId())) {
-                p.teleport(homes.get(p.getUniqueId()));
-                p.sendMessage("§aTeleportado!");
+            Location loc = dataConfig.getLocation("homes." + p.getUniqueId() + "." + nome);
+            if (loc != null) {
+                p.teleport(loc);
+                p.sendMessage("§a[!] Teleportado!");
             } else {
-                p.sendMessage("§cSem home!");
+                p.sendMessage("§c[!] Home nao encontrada.");
             }
             return true;
         }
 
-        // --- CONTROL COM MENU ---
+        // --- ZUEIRA (ADICIONAR PALAVRA) ---
+        if (c.equals("zueira") && p.hasPermission("humanangel.admin")) {
+            if (args.length == 0) {
+                p.sendMessage("§cUse: /zueira (palavra)");
+                return true;
+            }
+            List<String> filtro = dataConfig.getStringList("filtroZueira");
+            String palavra = args[0].toLowerCase();
+            
+            if (!filtro.contains(palavra)) {
+                filtro.add(palavra);
+                dataConfig.set("filtroZueira", filtro);
+                saveData();
+                p.sendMessage("§a[!] Palavra '§e" + palavra + "§a' adicionada ao dados.yml!");
+            } else {
+                p.sendMessage("§e[!] Essa palavra ja esta no filtro.");
+            }
+            return true;
+        }
+
+        // --- CONTROL MENU ---
         if (c.equals("control") && p.hasPermission("humanangel.admin")) {
             Inventory inv = Bukkit.createInventory(null, 54, "§8Controle de Jogadores");
             for (Player online : Bukkit.getOnlinePlayers()) {
@@ -90,12 +92,24 @@ public class Main extends JavaPlugin implements Listener, CommandExecutor {
             return true;
         }
 
-        // Outros comandos básicos da 1.6
-        if (c.equals("spawn")) p.teleport(p.getWorld().getSpawnLocation());
-        if (c.equals("morte")) p.setHealth(0);
-        if (c.equals("zueira")) zueiraAtiva = !zueiraAtiva;
+        // Comandos Simples
+        if (c.equals("spawn")) { p.teleport(p.getWorld().getSpawnLocation()); return true; }
+        if (c.equals("morte")) { p.setHealth(0); return true; }
 
         return true;
+    }
+
+    @EventHandler
+    public void onChat(AsyncPlayerChatEvent e) {
+        List<String> filtro = dataConfig.getStringList("filtroZueira");
+        String msg = e.getMessage().toLowerCase();
+        
+        for (String palavra : filtro) {
+            if (msg.contains(palavra)) {
+                e.setMessage("§dEu amo esse servidor! ❤");
+                break;
+            }
+        }
     }
 
     @EventHandler
@@ -103,16 +117,15 @@ public class Main extends JavaPlugin implements Listener, CommandExecutor {
         if (e.getView().getTitle().equals("§8Controle de Jogadores")) {
             e.setCancelled(true);
             if (e.getCurrentItem() == null) return;
-            Player target = Bukkit.getPlayer(ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName()));
-            if (target != null) {
+            Player alvo = Bukkit.getPlayer(ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName()));
+            if (alvo != null) {
                 Player adm = (Player) e.getWhoClicked();
-                adm.teleport(target);
-                adm.sendMessage("§aTeleportado para " + target.getName());
+                adm.teleport(alvo);
+                adm.sendMessage("§a[!] Teleportado para " + alvo.getName());
             }
         }
     }
 
-    // --- SISTEMA DE ARMAZENAMENTO ---
     private void setupStorage() {
         if (!getDataFolder().exists()) getDataFolder().mkdirs();
         dataFile = new File(getDataFolder(), "dados.yml");
@@ -120,13 +133,6 @@ public class Main extends JavaPlugin implements Listener, CommandExecutor {
             try { dataFile.createNewFile(); } catch (IOException e) { e.printStackTrace(); }
         }
         dataConfig = YamlConfiguration.loadConfiguration(dataFile);
-    }
-
-    private void loadData() {
-        // Carrega avisos e configurações do arquivo
-        if (dataConfig.contains("avisos")) {
-            listaAvisos = dataConfig.getStringList("avisos");
-        }
     }
 
     private void saveData() {
