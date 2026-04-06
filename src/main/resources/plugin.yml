@@ -1,29 +1,34 @@
 name: HumanAngel
-version: 1.7
+version: 2.0
 main: com.humanangel.Main
-api-version: 1.21
-authors: [HumanAngel]
-description: Plugin v1.7 com Chapéu Bedrock, Avisos 30min e Chat Staff.
+api-version: 1.20
+author: Miguel
+depend: [TAB]
 
 commands:
-  ha: {description: "Info"}
-  modo: {description: "Gamemode"}
-  home: {description: "Home"}
-  sethome: {description: "Setar"}
-  spawn: {description: "Spawn"}
-  control: {description: "Staff Menu"}
-  lista: {description: "Comandos"}
-  clearlag: {description: "Limpar"}
-  tpa: {description: "TPA"}
-  tpaccept: {description: "Aceitar"}
-  zueira: {description: "Filtro"}
-  avisos: {description: "Auto-Avisos"}
-  luz: {description: "NightVision"}
-  corrigir: {description: "Reparar"}
-  chapeu: {description: "Bedrock Hat"}
-  lixeira: {description: "Lixeira"}
-  perfil: {description: "Perfil Completo"}
-  anuncio: {description: "Titulo"}
-  morte: {description: "Suicidio"}
-  compactar: {description: "Compactar"}
-  sc: {description: "Chat Staff"}
+  # JOGADORES
+  ha: { description: "Status do Human Angel" }
+  perfil: { description: "Ver perfil do jogador" }
+  lista: { description: "Lista de comandos" }
+  home: { description: "Ir para uma home", usage: "/home <nome>" }
+  sethome: { description: "Criar uma home", usage: "/sethome <nome>" }
+  tpa: { description: "Pedir teleporte" }
+  tpaccept: { description: "Aceitar teleporte" }
+  tpdeny: { description: "Negar teleporte" }
+  spawn: { description: "Ir para o spawn" }
+  luz: { description: "Ativar visao noturna" }
+  lixeira: { description: "Abrir lixeira" }
+  compactar: { description: "Compactar minerios" }
+  chapeu: { description: "Colocar item na cabeca" }
+  morte: { description: "Suicidio" }
+
+  # ADM (Requer permissao humanangel.adm)
+  modo: { description: "Trocar gamemode" }
+  control: { description: "Menu de controle" }
+  anuncio: { description: "Enviar anuncio na tela" }
+  clearlag: { description: "Limpar itens do chao" }
+  corrigir: { description: "Reparar itens" }
+  congelar: { description: "Congelar jogador" }
+  mudarip: { description: "Mudar/Ver IP" }
+  zueira: { description: "Filtro de chat" }
+  avisos: { description: "Mensagens do servidor" }
