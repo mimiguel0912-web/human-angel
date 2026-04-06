@@ -1,34 +1,28 @@
 name: HumanAngel
-version: 2.0
+version: 1.6
 main: com.humanangel.Main
-api-version: 1.20
-author: Miguel
-depend: [TAB]
-
+api-version: 1.21
 commands:
-  # JOGADORES
-  ha: { description: "Status do Human Angel" }
-  perfil: { description: "Ver perfil do jogador" }
-  lista: { description: "Lista de comandos" }
-  home: { description: "Ir para uma home", usage: "/home <nome>" }
-  sethome: { description: "Criar uma home", usage: "/sethome <nome>" }
-  tpa: { description: "Pedir teleporte" }
-  tpaccept: { description: "Aceitar teleporte" }
-  tpdeny: { description: "Negar teleporte" }
-  spawn: { description: "Ir para o spawn" }
-  luz: { description: "Ativar visao noturna" }
-  lixeira: { description: "Abrir lixeira" }
-  compactar: { description: "Compactar minerios" }
-  chapeu: { description: "Colocar item na cabeca" }
-  morte: { description: "Suicidio" }
-
-  # ADM (Requer permissao humanangel.adm)
-  modo: { description: "Trocar gamemode" }
-  control: { description: "Menu de controle" }
-  anuncio: { description: "Enviar anuncio na tela" }
-  clearlag: { description: "Limpar itens do chao" }
-  corrigir: { description: "Reparar itens" }
-  congelar: { description: "Congelar jogador" }
-  mudarip: { description: "Mudar/Ver IP" }
-  zueira: { description: "Filtro de chat" }
-  avisos: { description: "Mensagens do servidor" }
+  ha: {description: Status}
+  modo: {description: Gamemodes}
+  home: {description: Ir home}
+  sethome: {description: Setar home}
+  spawn: {description: Spawn}
+  control: {description: Menu de cabeças}
+  lista: {description: Lista de comandos}
+  clearlag: {description: Limpar chao}
+  tpa: {description: Pedir TPA}
+  tpaccept: {description: Aceitar}
+  tpdeny: {description: Negar}
+  zueira: {description: Filtro chat}
+  avisos: {description: Mensagens auto}
+  luz: {description: Visao Noturna}
+  corrigir: {description: Reparar item}
+  mudarip: {description: Ver IP}
+  chapeu: {description: Bloco na cabeca}
+  lixeira: {description: Lixeira}
+  perfil: {description: Perfil}
+  anuncio: {description: Title}
+  congelar: {description: Congelar}
+  morte: {description: kill}
+  compactar: {description: Minerios}
