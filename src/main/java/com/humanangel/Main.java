@@ -1,10 +1,11 @@
 package com.humanangel;
 
 import org.bukkit.*;
-import org.bukkit.ban.BanList;
 import org.bukkit.command.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -30,8 +31,6 @@ public class Main extends JavaPlugin implements CommandExecutor {
         saveDefaultConfig();
 
         createHomesFile();
-
-        // COMANDOS
 
         getCommand("ha").setExecutor(this);
         getCommand("modo").setExecutor(this);
@@ -260,10 +259,17 @@ public class Main extends JavaPlugin implements CommandExecutor {
 
             for (World world : Bukkit.getWorlds()) {
 
-                removidos += world.getEntities().size();
+                for (Entity entity : world.getEntities()) {
+
+                    if (entity instanceof Item) {
+
+                        entity.remove();
+                        removidos++;
+                    }
+                }
             }
 
-            Bukkit.broadcastMessage("§cClearLag executado.");
+            Bukkit.broadcastMessage("§cClearLag executado. Itens removidos: §f" + removidos);
 
             return true;
         }
@@ -358,13 +364,11 @@ public class Main extends JavaPlugin implements CommandExecutor {
 
             } else {
 
-                p.addPotionEffect(
-                        new PotionEffect(
-                                PotionEffectType.NIGHT_VISION,
-                                999999,
-                                1
-                        )
-                );
+                p.addPotionEffect(new PotionEffect(
+                        PotionEffectType.NIGHT_VISION,
+                        999999,
+                        1
+                ));
 
                 p.sendMessage("§aVisão noturna ativada.");
             }
@@ -536,13 +540,11 @@ public class Main extends JavaPlugin implements CommandExecutor {
                 return true;
             }
 
-            alvo.addPotionEffect(
-                    new PotionEffect(
-                            PotionEffectType.SLOWNESS,
-                            999999,
-                            255
-                    )
-            );
+            alvo.addPotionEffect(new PotionEffect(
+                    PotionEffectType.SLOW,
+                    999999,
+                    255
+            ));
 
             alvo.sendMessage("§cVocê foi congelado.");
 
@@ -620,9 +622,7 @@ public class Main extends JavaPlugin implements CommandExecutor {
 
             if (args[0].equalsIgnoreCase("inv")) {
 
-                Inventory inv = alvo.getInventory();
-
-                p.openInventory(inv);
+                p.openInventory(alvo.getInventory());
             }
 
             return true;
@@ -764,4 +764,4 @@ public class Main extends JavaPlugin implements CommandExecutor {
 
         return false;
     }
-                  }
+                }
