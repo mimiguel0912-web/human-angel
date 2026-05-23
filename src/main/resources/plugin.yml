@@ -2,27 +2,103 @@ name: HumanAngel
 version: 1.6
 main: com.humanangel.Main
 api-version: 1.21
+
 commands:
-  ha: {description: Status}
-  modo: {description: Gamemodes}
-  home: {description: Ir home}
-  sethome: {description: Setar home}
-  spawn: {description: Spawn}
-  control: {description: Menu de cabeças}
-  lista: {description: Lista de comandos}
-  clearlag: {description: Limpar chao}
-  tpa: {description: Pedir TPA}
-  tpaccept: {description: Aceitar}
-  tpdeny: {description: Negar}
-  zueira: {description: Filtro chat}
-  avisos: {description: Mensagens auto}
-  luz: {description: Visao Noturna}
-  corrigir: {description: Reparar item}
-  mudarip: {description: Ver IP}
-  chapeu: {description: Bloco na cabeca}
-  lixeira: {description: Lixeira}
-  perfil: {description: Perfil}
-  anuncio: {description: Title}
-  congelar: {description: Congelar}
-  morte: {description: kill}
-  compactar: {description: Minerios}
+
+  ha:
+    description: Status
+
+  modo:
+    description: Gamemodes
+
+  home:
+    description: Ir home
+
+  sethome:
+    description: Setar home
+
+  delhome:
+    description: Deletar home
+
+  homes:
+    description: Lista de homes
+
+  spawn:
+    description: Spawn
+
+  control:
+    description: Painel admin
+
+  lista:
+    description: Lista de comandos
+
+  ajuda:
+    description: Ajuda do plugin
+
+  clearlag:
+    description: Limpar chão
+
+  tpa:
+    description: Pedir TPA
+
+  tpaccept:
+    description: Aceitar
+
+  tpdeny:
+    description: Negar
+
+  luz:
+    description: Visao Noturna
+
+  corrigir:
+    description: Reparar item
+
+  mudarip:
+    description: Ver IP
+
+  chapeu:
+    description: Bloco na cabeça
+
+  lixeira:
+    description: Lixeira
+
+  perfil:
+    description: Perfil
+
+  aviso:
+    description: Aviso global
+
+  congelar:
+    description: Congelar jogador
+
+  morte:
+    description: Matar jogador
+
+permissions:
+
+  humanangel.admin:
+    default: op
+
+  humanangel.ha:
+    default: op
+
+  humanangel.modo:
+    default: op
+
+  humanangel.control:
+    default: op
+
+  humanangel.clearlag:
+    default: op
+
+  humanangel.corrigir:
+    default: op
+
+  humanangel.mudarip:
+    default: op
+
+  humanangel.aviso:
+    default: op
+
+  humanangel.congelar:
+    default: op
