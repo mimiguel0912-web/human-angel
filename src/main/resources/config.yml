@@ -1,13 +1,1 @@
-# Configurações do Human Angel Core
-Zoeira:
-  tempo-segundos: 600
-  prefixo: "&6[&bZoeira&6] &f"
-  frases:
-    - "&eCuidado, o ADM tá de olho!"
-    - "&aMineração sem tocha dá medo, né?"
-    - "&dO servidor da zoeira agradece sua presença!"
-
-Teleporte:
-  delay: 5
-  som-sucesso: "ENTITY_PLAYER_LEVELUP"
-  particula: "PORTAL"
+home: 3
