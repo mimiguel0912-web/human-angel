@@ -789,6 +789,82 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
 
             Inventory menu = Bukkit.createInventory(
                     null,
-          }
+                    27,
+                    "§bControl: " + alvo.getName()
+            );
+
+            ItemStack tp = new ItemStack(Material.COMPASS);
+            ItemMeta tpMeta = tp.getItemMeta();
+            tpMeta.setDisplayName("§aTeleportar");
+            tp.setItemMeta(tpMeta);
+
+            ItemStack inv = new ItemStack(Material.CHEST);
+            ItemMeta invMeta = inv.getItemMeta();
+            invMeta.setDisplayName("§eInventário");
+            inv.setItemMeta(invMeta);
+
+            ItemStack ip = new ItemStack(Material.PAPER);
+            ItemMeta ipMeta = ip.getItemMeta();
+            ipMeta.setDisplayName("§bVer IP");
+            ip.setItemMeta(ipMeta);
+
+            ItemStack ban = new ItemStack(Material.BARRIER);
+            ItemMeta banMeta = ban.getItemMeta();
+            banMeta.setDisplayName("§cBanir");
+            ban.setItemMeta(banMeta);
+
+            menu.setItem(10, tp);
+            menu.setItem(12, inv);
+            menu.setItem(14, ip);
+            menu.setItem(16, ban);
+
+            p.openInventory(menu);
+        }
+
+        if (e.getView().getTitle().startsWith("§bControl: ")) {
+
+            e.setCancelled(true);
+
+            if (e.getCurrentItem() == null) return;
+
+            String nome = ChatColor.stripColor(
+                    e.getView().getTitle().replace("§bControl: ", "")
+            );
+
+            Player alvo = Bukkit.getPlayer(nome);
+
+            if (alvo == null) return;
+
+            Material type = e.getCurrentItem().getType();
+
+            if (type == Material.COMPASS) {
+
+                p.teleport(alvo);
+
+                p.sendMessage("§aTeleportado.");
+            }
+
+            if (type == Material.CHEST) {
+
+                p.openInventory(alvo.getInventory());
+            }
+
+            if (type == Material.PAPER) {
+
+                String ip = alvo.getAddress().getAddress().getHostAddress();
+
+                p.sendMessage("§bIP: §f" + ip);
+            }
+
+            if (type == Material.BARRIER) {
+
+                Bukkit.banIP(
+                        alvo.getAddress().getAddress().getHostAddress()
+                );
+
+                alvo.kickPlayer("§cVocê foi banido.");
+            }
+        }
     }
-}
+                }
+                
