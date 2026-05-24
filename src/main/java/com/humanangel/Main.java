@@ -19,6 +19,13 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.Statistic;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,53 +35,94 @@ import java.util.UUID;
 public class Main extends JavaPlugin implements CommandExecutor, Listener {
 
     private File homesFile;
-    private FileConfiguration homes;
+private FileConfiguration homes;
 
-    private final HashMap<UUID, UUID> tpa = new HashMap<>();
+private final HashMap<UUID, UUID> tpa = new HashMap<>();
 
-    @Override
-    public void onEnable() {
+private final HashMap<UUID, UUID> reply = new HashMap<>();
 
-        saveDefaultConfig();
+private final List<UUID> vanish = new ArrayList<>();
 
-        createHomesFile();
+private final List<UUID> staffchat = new ArrayList<>();
 
-        Bukkit.getPluginManager().registerEvents(this, this);
+@Override
+public void onEnable() {
 
-        String[] cmds = {
-                "ha",
-                "modo",
-                "home",
-                "sethome",
-                "delhome",
-                "homes",
-                "spawn",
-                "control",
-                "lista",
-                "ajuda",
-                "clearlag",
-                "tpa",
-                "tpaccept",
-                "tpdeny",
-                "luz",
-                "corrigir",
-                "mudarip",
-                "chapeu",
-                "lixeira",
-                "perfil",
-                "aviso",
-                "congelar",
-                "morte"
-        };
+    String[] cmds = {
 
-        for (String cmd : cmds) {
+            "ha",
+            "modo",
 
-            getCommand(cmd).setExecutor(this);
-        }
+            "home",
+            "sethome",
+            "delhome",
+            "homes",
 
-        Bukkit.getConsoleSender().sendMessage("§9HumanAngel §aLigado.");
+            "spawn",
+
+            "control",
+
+            "lista",
+            "ajuda",
+
+            "clearlag",
+
+            "tpa",
+            "tpaccept",
+            "tpdeny",
+
+            "luz",
+            "corrigir",
+            "mudarip",
+            "chapeu",
+            "lixeira",
+            "perfil",
+            "aviso",
+            "congelar",
+            "morte",
+
+            "craft",
+            "ender",
+            "tempo",
+            "status",
+            "top",
+            "ping",
+            "near",
+
+            "msg",
+            "reply",
+
+            "fakejoin",
+            "fakeleave",
+
+            "vanish",
+            "tpall",
+
+            "warn",
+            "warns",
+
+            "staff",
+            "logs",
+
+            "apc",
+            "staffmode"
+    };
+
+    saveDefaultConfig();
+
+    createHomesFile();
+
+    Bukkit.getPluginManager().registerEvents(this, this);
+
+    for (String cmd : cmds) {
+
+        getCommand(cmd).setExecutor(this);
     }
 
+    Bukkit.getConsoleSender().sendMessage(
+            "§9HumanAngel §aLigado."
+    );
+}
     @Override
     public void onDisable() {
 
@@ -141,15 +189,323 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
 
             p.sendMessage(" ");
             p.sendMessage("§9§lHUMAN ANGEL");
-            p.sendMessage("§fFuncionando.");
+            p.sendMessage("§fnova versão talvez a melhor");
             p.sendMessage("§fVersão: §b1.6");
             p.sendMessage(" ");
 
             return true;
         }
 
-        // /LISTA
+// ===============================
+// COMANDO /CRAFT
+// ===============================
 
+if (command.getName().equalsIgnoreCase("craft")) {
+
+    p.openWorkbench(null, true);
+
+    p.sendMessage("§aCrafting aberta.");
+
+    return true;
+}
+
+// ===============================
+// COMANDO /ENDER
+// ===============================
+
+if (command.getName().equalsIgnoreCase("ender")) {
+
+    p.openInventory(p.getEnderChest());
+
+    p.sendMessage("§aEnderChest aberta.");
+
+    return true;
+}
+
+// ===============================
+// COMANDO /PING
+// ===============================
+
+if (command.getName().equalsIgnoreCase("ping")) {
+
+    p.sendMessage("§bPing: §f" + p.getPing() + "ms");
+
+    return true;
+}
+
+// ===============================
+// COMANDO /TEMPO
+// ===============================
+
+if (command.getName().equalsIgnoreCase("tempo")) {
+
+    long ticks = p.getStatistic(Statistic.PLAY_ONE_MINUTE);
+
+    long segundos = ticks / 20;
+
+    long horas = segundos / 3600;
+
+    long minutos = (segundos % 3600) / 60;
+
+    p.sendMessage("§bTempo online: §f" + horas + "h " + minutos + "m");
+
+    return true;
+}
+
+// ===============================
+// COMANDO /STATUS
+// ===============================
+
+if (command.getName().equalsIgnoreCase("status")) {
+
+    int ping = p.getPing();
+
+    long ticks = p.getStatistic(Statistic.PLAY_ONE_MINUTE);
+
+    long segundos = ticks / 20;
+
+    long horas = segundos / 3600;
+
+    long minutos = (segundos % 3600) / 60;
+
+    p.sendMessage("§8§m----------------------");
+    p.sendMessage("§9§lStatus");
+
+    p.sendMessage("§bNome: §f" + p.getName());
+    p.sendMessage("§bVida: §f" + p.getHealth());
+    p.sendMessage("§bFome: §f" + p.getFoodLevel());
+    p.sendMessage("§bXP: §f" + p.getLevel());
+    p.sendMessage("§bPing: §f" + ping + "ms");
+
+    p.sendMessage("§bKills: §f" + p.getStatistic(Statistic.PLAYER_KILLS));
+    p.sendMessage("§bMortes: §f" + p.getStatistic(Statistic.DEATHS));
+
+    p.sendMessage("§bTempo Online: §f" + horas + "h " + minutos + "m");
+
+    p.sendMessage("§8§m----------------------");
+
+    return true;
+}
+
+// ===============================
+// COMANDO /NEAR
+// ===============================
+
+if (command.getName().equalsIgnoreCase("near")) {
+
+    p.sendMessage("§9§lJogadores próximos");
+
+    for (Player target : Bukkit.getOnlinePlayers()) {
+
+        if (target == p) continue;
+
+        double distancia = target.getLocation().distance(p.getLocation());
+
+        if (distancia <= 100) {
+
+            p.sendMessage("§b" + target.getName() + " §f(" + (int) distancia + " blocos)");
+        }
+    }
+
+    return true;
+}
+
+// ===============================
+// COMANDO /MSG
+// ===============================
+
+if (command.getName().equalsIgnoreCase("msg")) {
+
+    if (args.length < 2) {
+
+        p.sendMessage("§cUse /msg <player> <mensagem>");
+        return true;
+    }
+
+    Player alvo = Bukkit.getPlayer(args[0]);
+
+    if (alvo == null) {
+
+        p.sendMessage("§cJogador offline.");
+        return true;
+    }
+
+    StringBuilder msg = new StringBuilder();
+
+    for (int i = 1; i < args.length; i++) {
+
+        msg.append(args[i]).append(" ");
+    }
+
+    alvo.sendMessage("§d[MSG] " + p.getName() + ": " + msg);
+
+    p.sendMessage("§d[MSG] Para " + alvo.getName() + ": " + msg);
+
+    reply.put(p.getUniqueId(), alvo.getUniqueId());
+
+    reply.put(alvo.getUniqueId(), p.getUniqueId());
+
+    return true;
+}
+
+// ===============================
+// COMANDO /REPLY
+// ===============================
+
+if (command.getName().equalsIgnoreCase("reply")) {
+
+    if (!reply.containsKey(p.getUniqueId())) {
+
+        p.sendMessage("§cNinguém para responder.");
+        return true;
+    }
+
+    if (args.length == 0) {
+
+        p.sendMessage("§cUse /reply <mensagem>");
+        return true;
+    }
+
+    Player alvo = Bukkit.getPlayer(reply.get(p.getUniqueId()));
+
+    if (alvo == null) {
+
+        p.sendMessage("§cJogador offline.");
+        return true;
+    }
+
+    StringBuilder msg = new StringBuilder();
+
+    for (String s : args) {
+
+        msg.append(s).append(" ");
+    }
+
+    alvo.sendMessage("§d[MSG] " + p.getName() + ": " + msg);
+
+    p.sendMessage("§d[MSG] Para " + alvo.getName() + ": " + msg);
+
+    return true;
+}
+
+// ===============================
+// COMANDO /VANISH
+// ===============================
+
+if (command.getName().equalsIgnoreCase("vanish")) {
+
+    if (vanish.contains(p.getUniqueId())) {
+
+        vanish.remove(p.getUniqueId());
+
+        for (Player online : Bukkit.getOnlinePlayers()) {
+
+            online.showPlayer(this, p);
+        }
+
+        p.sendMessage("§cVanish desativado.");
+
+    } else {
+
+        vanish.add(p.getUniqueId());
+
+        for (Player online : Bukkit.getOnlinePlayers()) {
+
+            online.hidePlayer(this, p);
+        }
+
+        p.sendMessage("§aVanish ativado.");
+    }
+
+    return true;
+}
+
+// ===============================
+// COMANDO /TPALL
+// ===============================
+
+if (command.getName().equalsIgnoreCase("tpall")) {
+
+    for (Player online : Bukkit.getOnlinePlayers()) {
+
+        if (online != p) {
+
+            online.teleport(p);
+        }
+    }
+
+    Bukkit.broadcastMessage("§aTodos foram teleportados.");
+
+    return true;
+}
+
+// ===============================
+// COMANDO /FAKEJOIN
+// ===============================
+
+if (command.getName().equalsIgnoreCase("fakejoin")) {
+
+    Bukkit.broadcastMessage("§e" + p.getName() + " entrou no jogo");
+
+    return true;
+}
+
+// ===============================
+// COMANDO /FAKELEAVE
+// ===============================
+
+if (command.getName().equalsIgnoreCase("fakeleave")) {
+
+    Bukkit.broadcastMessage("§e" + p.getName() + " saiu do jogo");
+
+    return true;
+}
+
+// ===============================
+// COMANDO /WARN
+// ===============================
+
+if (command.getName().equalsIgnoreCase("warn")) {
+
+    if (args.length < 2) {
+
+        p.sendMessage("§cUse /warn <player> <motivo>");
+        return true;
+    }
+
+    Player alvo = Bukkit.getPlayer(args[0]);
+
+    if (alvo == null) {
+
+        p.sendMessage("§cJogador offline.");
+        return true;
+    }
+
+    StringBuilder motivo = new StringBuilder();
+
+    for (int i = 1; i < args.length; i++) {
+
+        motivo.append(args[i]).append(" ");
+    }
+
+    alvo.sendMessage("§c⚠ Você recebeu um aviso.");
+    alvo.sendMessage("§fMotivo: §c" + motivo);
+
+    p.sendMessage("§aWarn enviado.");
+
+    return true;
+}
+
+// ===============================
+// COMANDO /STAFF
+// ===============================
+
+if (command.getName().equalsIgnoreCase("staff")) {
+
+
+
+        // /LISTA
+        
         if (command.getName().equalsIgnoreCase("lista")) {
 
             p.sendMessage("§8§m----------------------");
@@ -354,6 +710,12 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
         }
 
         // /TPA
+
+        private final HashMap<UUID, UUID> reply = new HashMap<>();
+
+private final List<UUID> vanish = new ArrayList<>();
+
+private final List<UUID> staffchat = new ArrayList<>();
 
         if (command.getName().equalsIgnoreCase("tpa")) {
 
