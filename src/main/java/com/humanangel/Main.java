@@ -505,83 +505,162 @@ if (command.getName().equalsIgnoreCase("staff")) {
 
 
         // /LISTA
-        
-        if (command.getName().equalsIgnoreCase("lista")) {
 
-            p.sendMessage("§8§m----------------------");
-            p.sendMessage("§9§lLista de Comandos");
+if (command.getName().equalsIgnoreCase("lista")) {
 
-            p.sendMessage("§b/home");
-            p.sendMessage("§b/sethome");
-            p.sendMessage("§b/delhome");
-            p.sendMessage("§b/homes");
-            p.sendMessage("§b/spawn");
-            p.sendMessage("§b/tpa");
-            p.sendMessage("§b/tpaccept");
-            p.sendMessage("§b/tpdeny");
-            p.sendMessage("§b/luz");
-            p.sendMessage("§b/chapeu");
-            p.sendMessage("§b/lixeira");
-            p.sendMessage("§b/perfil");
+    p.sendMessage("§8§m--------------------------");
+    p.sendMessage("§9§lLista de Comandos");
 
-            if (p.isOp()) {
+    p.sendMessage("§b/home");
+    p.sendMessage("§b/sethome");
+    p.sendMessage("§b/delhome");
+    p.sendMessage("§b/homes");
 
-                p.sendMessage(" ");
-                p.sendMessage("§c§lAdmin");
+    p.sendMessage("§b/spawn");
 
-                p.sendMessage("§c/modo");
-                p.sendMessage("§c/control");
-                p.sendMessage("§c/clearlag");
-                p.sendMessage("§c/corrigir");
-                p.sendMessage("§c/mudarip");
-                p.sendMessage("§c/aviso");
-                p.sendMessage("§c/congelar");
-                p.sendMessage("§c/ha");
-            }
+    p.sendMessage("§b/tpa");
+    p.sendMessage("§b/tpaccept");
+    p.sendMessage("§b/tpdeny");
 
-            p.sendMessage("§8§m----------------------");
+    p.sendMessage("§b/msg");
+    p.sendMessage("§b/reply");
 
-            return true;
-        }
+    p.sendMessage("§b/luz");
+    p.sendMessage("§b/chapeu");
+    p.sendMessage("§b/lixeira");
+    p.sendMessage("§b/perfil");
+
+    p.sendMessage("§b/craft");
+    p.sendMessage("§b/ender");
+
+    p.sendMessage("§b/ping");
+    p.sendMessage("§b/tempo");
+    p.sendMessage("§b/near");
+
+    if (p.isOp()) {
+
+        p.sendMessage(" ");
+        p.sendMessage("§c§lAdmin");
+
+        p.sendMessage("§c/ha");
+        p.sendMessage("§c/modo");
+
+        p.sendMessage("§c/control");
+
+        p.sendMessage("§c/clearlag");
+
+        p.sendMessage("§c/corrigir");
+        p.sendMessage("§c/mudarip");
+
+        p.sendMessage("§c/aviso");
+        p.sendMessage("§c/congelar");
+
+        p.sendMessage("§c/fakejoin");
+        p.sendMessage("§c/fakeleave");
+
+        p.sendMessage("§c/vanish");
+        p.sendMessage("§c/tpall");
+
+        p.sendMessage("§c/warn");
+        p.sendMessage("§c/warns");
+
+        p.sendMessage("§c/staff");
+        p.sendMessage("§c/logs");
+
+        p.sendMessage("§c/apc");
+        p.sendMessage("§c/staffmode");
+    }
+
+    p.sendMessage("§8§m--------------------------");
+
+    return true;
+}
 
         // /AJUDA
 
-        if (command.getName().equalsIgnoreCase("ajuda")) {
+if (command.getName().equalsIgnoreCase("ajuda")) {
 
-            p.sendMessage("§8§m----------------------");
-            p.sendMessage("§9§lAjuda");
+    p.sendMessage("§8§m--------------------------");
+    p.sendMessage("§9§lAjuda");
 
-            p.sendMessage("§b/home §f- Teleporta para home");
-            p.sendMessage("§b/sethome §f- Cria uma home");
-            p.sendMessage("§b/delhome §f- Remove uma home");
-            p.sendMessage("§b/homes §f- Lista homes");
+    p.sendMessage("§b/home §f- Teleporta para uma home");
+    p.sendMessage("§b/sethome §f- Cria uma home");
+    p.sendMessage("§b/delhome §f- Remove uma home");
+    p.sendMessage("§b/homes §f- Lista suas homes");
 
-            p.sendMessage("§b/tpa §f- Pedido de teleporte");
-            p.sendMessage("§b/tpaccept §f- Aceita TPA");
-            p.sendMessage("§b/tpdeny §f- Recusa TPA");
+    p.sendMessage("§b/spawn §f- Vai para o spawn");
 
-            p.sendMessage("§b/luz §f- Visão noturna");
-            p.sendMessage("§b/chapeu §f- Item na cabeça");
-            p.sendMessage("§b/lixeira §f- Abre lixeira");
-            p.sendMessage("§b/perfil §f- Ver perfil");
+    p.sendMessage("§b/tpa §f- Envia pedido de teleporte");
+    p.sendMessage("§b/tpaccept §f- Aceita TPA");
+    p.sendMessage("§b/tpdeny §f- Recusa TPA");
 
-            if (p.isOp()) {
+    p.sendMessage("§b/msg §f- Mensagem privada");
+    p.sendMessage("§b/reply §f- Responde mensagem");
 
-                p.sendMessage(" ");
-                p.sendMessage("§c§lAdmin");
+    p.sendMessage("§b/luz §f- Visão noturna");
 
-                p.sendMessage("§c/control §f- Painel admin");
-                p.sendMessage("§c/clearlag §f- Limpa itens");
-                p.sendMessage("§c/corrigir §f- Repara item");
-                p.sendMessage("§c/mudarip §f- Ver IP");
-                p.sendMessage("§c/aviso §f- Aviso global");
-                p.sendMessage("§c/congelar §f- Congelar jogador");
-            }
+    p.sendMessage("§b/chapeu §f- Coloca item na cabeça");
 
-            p.sendMessage("§8§m----------------------");
+    p.sendMessage("§b/lixeira §f- Abre lixeira");
 
-            return true;
-        }
+    p.sendMessage("§b/perfil §f- Mostra informações");
+
+    p.sendMessage("§b/craft §f- Abre crafting");
+
+    p.sendMessage("§b/ender §f- Abre EnderChest");
+
+    p.sendMessage("§b/ping §f- Mostra seu ping");
+
+    p.sendMessage("§b/tempo §f- Tempo online");
+
+    p.sendMessage("§b/near §f- Jogadores próximos");
+
+    if (p.isOp()) {
+
+        p.sendMessage(" ");
+        p.sendMessage("§c§lAdmin");
+
+        p.sendMessage("§c/ha §f- Status do plugin");
+
+        p.sendMessage("§c/modo §f- Muda gamemode");
+
+        p.sendMessage("§c/control §f- Painel admin");
+
+        p.sendMessage("§c/clearlag §f- Remove itens");
+
+        p.sendMessage("§c/corrigir §f- Repara item");
+
+        p.sendMessage("§c/mudarip §f- Ver IP jogador");
+
+        p.sendMessage("§c/aviso §f- Aviso global");
+
+        p.sendMessage("§c/congelar §f- Congela jogador");
+
+        p.sendMessage("§c/fakejoin §f- Fake entrada");
+
+        p.sendMessage("§c/fakeleave §f- Fake saída");
+
+        p.sendMessage("§c/vanish §f- Invisível");
+
+        p.sendMessage("§c/tpall §f- Puxa todos");
+
+        p.sendMessage("§c/warn §f- Aviso jogador");
+
+        p.sendMessage("§c/warns §f- Ver warns");
+
+        p.sendMessage("§c/staff §f- Chat staff");
+
+        p.sendMessage("§c/logs §f- Logs staff");
+
+        p.sendMessage("§c/apc §f- Aparição");
+
+        p.sendMessage("§c/staffmode §f- Modo moderação");
+    }
+
+    p.sendMessage("§8§m--------------------------");
+
+    return true;
+}
 
         // /CONTROL
 
