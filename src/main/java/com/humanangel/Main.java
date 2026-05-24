@@ -789,4 +789,6 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
 
             Inventory menu = Bukkit.createInventory(
                     null,
-          
+          }
+    }
+}
