@@ -631,6 +631,19 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
             return true;
         }
 
+        // /MORTE
+
+        if (command.getName().equalsIgnoreCase("morte")) {
+
+            p.setHealth(0.0);
+
+            Bukkit.broadcastMessage(
+                    "§c" + p.getName() + " morreu brutalmente."
+            );
+
+            return true;
+        }
+
         // /SETHOME
 
         if (command.getName().equalsIgnoreCase("sethome")) {
@@ -863,21 +876,7 @@ public class Main extends JavaPlugin implements CommandExecutor, Listener {
                 );
 
                 alvo.kickPlayer("§cVocê foi banido.");
-
-                // /MORTE
-
-        if (command.getName().equalsIgnoreCase("morte")) {
-
-            p.setHealth(0.0);
-
-            Bukkit.broadcastMessage(
-                    "§c" + p.getName() + " morreu brutalmente."
-            );
-
-            return true;
-        }
             }
         }
     }
                 }
-                
